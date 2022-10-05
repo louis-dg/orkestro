@@ -18,7 +18,7 @@
 
     <ListView fx:id="tracksListView"/>
 
-    <VBox>
+    <VBox prefWidth="400">
         <Label>TMP tracksPane</Label>
         <AnchorPane fx:id="tracksPane"/>
 
