@@ -16,8 +16,8 @@
 
     <VBox prefWidth="400">
         <HBox spacing="10">
-            <Button text="Lecture" onAction="#onPlayClick"/>
-            <Button text="Stop" onAction="#onStopClick"/>
+            <Button fx:id="playBtn" text="Lecture" onAction="#onPlayClick" disable="true"/>
+            <Button fx:id="stopBtn" text="Stop" onAction="#onStopClick" disable="true"/>
         </HBox>
         <VBox spacing="5" fx:id="tracksPane"/>
     </VBox>
