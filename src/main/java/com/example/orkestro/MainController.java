@@ -22,10 +22,10 @@ public class MainController {
     private AnchorPane tracksPane = new AnchorPane();
 
     @FXML
-    private ListView<File> groupListView = new ListView<>();
+    private ListView<String> groupListView = new ListView<>();
 
     @FXML
-    private ListView<File> tracksListView = new ListView<>();
+    private ListView<String> tracksListView = new ListView<>();
 
     private MediaPlayer mediaPlayer = null;
 
@@ -42,26 +42,41 @@ public class MainController {
      */
     @FXML
     public void initialize() {
+        tracksListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+
         groupListView.setItems(initgroups());
         groupListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-//        groupListView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<File>() {
-//            @Override
-//            public void changed(ObservableValue<? extends File> observableValue, File file, File t1) {
-//
-//            }
-//        });
-        tracksListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        groupListView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observableValue, String previousValue, String nextValue) {
+                File dir = new File(BASE_DIR.getAbsolutePath() + File.separator + nextValue);
+                ObservableList<String> list = buildTrackslist(dir);
+                tracksListView.setItems(list);
+            }
+        });
+
     }
 
-    private ObservableList<File> initgroups()
+    private ObservableList<String> initgroups()
     {
-        List<File> groupDirectories = new ArrayList<>();
+        List<String> groupDirectories = new ArrayList<>();
         for (File file : BASE_DIR.listFiles()) {
             if(file.isDirectory()) {
-                groupDirectories.add(file);
+                groupDirectories.add(file.getName());
             }
         }
         return FXCollections.observableArrayList(groupDirectories);
+    }
+
+    private ObservableList<String> buildTrackslist(File dir)
+    {
+        List<String> tracks = new ArrayList<>();
+        for (File file : dir.listFiles()) {
+            if(file.isDirectory()) {
+                tracks.add(file.getName());
+            }
+        }
+        return FXCollections.observableArrayList(tracks);
     }
 
     private static File initBaseDir() {
