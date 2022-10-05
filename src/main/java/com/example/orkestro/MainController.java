@@ -14,7 +14,9 @@ import javafx.scene.media.MediaPlayer;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MainController {
 
@@ -27,17 +29,16 @@ public class MainController {
     @FXML
     private ListView<String> tracksListView = new ListView<>();
 
-    private MediaPlayer mediaPlayer = null;
+    private Map<String, MediaPlayer> medias = new HashMap<>();
 
     private static final File BASE_DIR = initBaseDir();
+    private static final String TRACKS_DIRNAME = "tracks";
 
     // TODO utiliser un slider pour afficher la progression
     // Volume : getMediaplayer().setVolume(0.1d);
     // Déplacement getMediaplayer().seek(Duration.minutes(1));
 
     /**
-     * Il faut deviner qu'il faut appeler cette méthode :
-     * https://stackoverflow.com/questions/34785417/javafx-fxml-controller-constructor-vs-initialize-method
      * https://docs.oracle.com/javase/8/javafx/api/javafx/fxml/doc-files/introduction_to_fxml.html#controllers
      */
     @FXML
@@ -54,7 +55,6 @@ public class MainController {
                 tracksListView.setItems(list);
             }
         });
-
     }
 
     private ObservableList<String> initgroups()
@@ -81,7 +81,7 @@ public class MainController {
 
     private static File initBaseDir() {
         try {
-            return new File(MainController.class.getResource("tracks").toURI());
+            return new File(MainController.class.getResource(TRACKS_DIRNAME).toURI());
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
@@ -90,34 +90,32 @@ public class MainController {
     @FXML
     protected void onPlayClick()
     {
-//        getMediaplayer(playText.getText());
-//        getMediaplayer().play();
+        File tracksDir = new File(BASE_DIR + File.separator + groupListView.getSelectionModel().getSelectedItem()
+                + File.separator + tracksListView.getSelectionModel().getSelectedItem());
+        medias.clear();
+        try {
+            for (File trackFile : tracksDir.listFiles()) {
+                //getClass().getResource("tracks/gojira/Sphinx/08 Sphinx_bass_mixed.mp3")
+                // use "/" because Media doesn't accept "\"
+                Media media = new Media(getClass().getResource(TRACKS_DIRNAME + "/" + groupListView.getSelectionModel().getSelectedItem() + "/"
+                        + tracksListView.getSelectionModel().getSelectedItem() + "/" + trackFile.getName()).toURI().toString());
+                medias.put(trackFile.getName(), new MediaPlayer(media));
+            }
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+
+        for (MediaPlayer mediaplayer: medias.values()) {
+            mediaplayer.play();
+        }
     }
 
     @FXML
     protected void onStopClick()
     {
-        getMediaplayer().stop();
-    }
-
-
-    private MediaPlayer getMediaplayer()
-    {
-        return getMediaplayer(null);
-    }
-
-    private MediaPlayer getMediaplayer(String mediaName)
-    {
-        if (mediaName != null && mediaPlayer == null)
-        {
-            try {
-                Media hit = new Media(getClass().getResource(mediaName).toURI().toString());
-                mediaPlayer = new MediaPlayer(hit);
-            } catch (URISyntaxException e) {
-                throw new RuntimeException(e);
-            }
+        for (MediaPlayer mediaplayer: medias.values()) {
+            mediaplayer.stop();
         }
-        return mediaPlayer;
     }
 
 }
