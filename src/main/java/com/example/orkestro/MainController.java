@@ -5,9 +5,11 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.control.Slider;
+import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 
@@ -21,7 +23,7 @@ import java.util.Map;
 public class MainController {
 
     @FXML
-    private AnchorPane tracksPane = new AnchorPane();
+    private VBox tracksPane = new VBox();
 
     @FXML
     private ListView<String> groupListView = new ListView<>();
@@ -33,14 +35,11 @@ public class MainController {
 
     private static final File BASE_DIR = initBaseDir();
     private static final String TRACKS_DIRNAME = "tracks";
+    private static final double DEFAULT_VOLUME = 0.5d;
 
-    // TODO utiliser un slider pour afficher la progression
-    // Volume : getMediaplayer().setVolume(0.1d);
     // Déplacement getMediaplayer().seek(Duration.minutes(1));
 
-    /**
-     * https://docs.oracle.com/javase/8/javafx/api/javafx/fxml/doc-files/introduction_to_fxml.html#controllers
-     */
+    //https://docs.oracle.com/javase/8/javafx/api/javafx/fxml/doc-files/introduction_to_fxml.html#controllers
     @FXML
     public void initialize() {
         tracksListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
@@ -90,6 +89,7 @@ public class MainController {
     @FXML
     protected void onPlayClick()
     {
+        // build medias map
         File tracksDir = new File(BASE_DIR + File.separator + groupListView.getSelectionModel().getSelectedItem()
                 + File.separator + tracksListView.getSelectionModel().getSelectedItem());
         medias.clear();
@@ -105,9 +105,30 @@ public class MainController {
             throw new RuntimeException(e);
         }
 
+        // play
         for (MediaPlayer mediaplayer: medias.values()) {
+            mediaplayer.setVolume(DEFAULT_VOLUME);
             mediaplayer.play();
         }
+
+        // update sliders
+        tracksPane.getChildren().clear();
+        for (Map.Entry<String, MediaPlayer> entry : medias.entrySet()) {
+            tracksPane.getChildren().add(new Label(entry.getKey()));
+            tracksPane.getChildren().add(buildSlider(entry.getValue()));
+        }
+    }
+
+    private Slider buildSlider(MediaPlayer mediaPlayer) {
+        Slider slider = new Slider(0, 1 ,DEFAULT_VOLUME);
+        slider.setShowTickMarks(true);
+        slider.setShowTickLabels(true);
+        slider.setMajorTickUnit(0.25f);
+        slider.setBlockIncrement(0.1f);
+        slider.valueProperty().addListener((observableValue, oldValue, newValue) -> {
+            mediaPlayer.setVolume(newValue.doubleValue());
+        });
+        return slider;
     }
 
     @FXML
