@@ -18,7 +18,6 @@
         <HBox spacing="10">
             <Button fx:id="musicFolderBtn" text="Dossier de musique" onAction="#onMusicFolderClick"/>
             <Button fx:id="playBtn" text="Lecture" onAction="#onPlayClick" disable="true"/>
-            <Button fx:id="stopBtn" text="Stop" onAction="#onStopClick" disable="true"/>
         </HBox>
         <VBox spacing="5" fx:id="tracksPane"/>
     </VBox>

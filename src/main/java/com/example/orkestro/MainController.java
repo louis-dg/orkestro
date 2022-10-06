@@ -23,9 +23,6 @@ public class MainController {
     public Button playBtn;
 
     @FXML
-    public Button stopBtn;
-
-    @FXML
     private VBox tracksPane = new VBox();
 
     @FXML
@@ -35,6 +32,7 @@ public class MainController {
     private ListView<String> tracksListView = new ListView<>();
 
     private Map<String, MediaPlayer> medias = new HashMap<>();
+    private boolean isPlaying = false;
 
     private static File BASE_DIR = null;
     private static final double DEFAULT_VOLUME = 0.5d;
@@ -46,10 +44,9 @@ public class MainController {
     public void initialize() {
         tracksListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         tracksListView.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
-            // enable buttons
             if(newValue != null){
                 playBtn.setDisable(false);
-                stopBtn.setDisable(false);
+                stopAllMedias();
             }
             if (tracksListView.getSelectionModel().getSelectedItem() != null){
                 updateMediaMap(groupListView.getSelectionModel().getSelectedItem(), tracksListView.getSelectionModel().getSelectedItem());
@@ -63,7 +60,6 @@ public class MainController {
             stopAllMedias();
             medias.clear();
             playBtn.setDisable(true);
-            stopBtn.setDisable(true);
             File groupDir = new File(BASE_DIR.getAbsolutePath() + File.separator + nextValue);
             ObservableList<String> list = buildTrackslist(groupDir);
             tracksListView.setItems(list);
@@ -142,9 +138,10 @@ public class MainController {
     @FXML
     protected void onPlayClick()
     {
-        for (MediaPlayer mediaplayer: medias.values()) {
-            mediaplayer.setVolume(DEFAULT_VOLUME);
-            mediaplayer.play();
+        if (isPlaying) {
+            stopAllMedias();
+        } else {
+            playAllMedias();
         }
     }
 
@@ -160,13 +157,18 @@ public class MainController {
         return slider;
     }
 
-    @FXML
-    protected void onStopClick()
-    {
-        stopAllMedias();
+    private void playAllMedias() {
+        isPlaying = true;
+        playBtn.setText("Stop");
+        for (MediaPlayer mediaplayer: medias.values()) {
+            mediaplayer.setVolume(DEFAULT_VOLUME);
+            mediaplayer.play();
+        }
     }
 
     private void stopAllMedias() {
+        isPlaying = false;
+        playBtn.setText("Lecture");
         for (MediaPlayer mediaplayer: medias.values()) {
             mediaplayer.stop();
         }
