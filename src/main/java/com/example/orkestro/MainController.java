@@ -60,6 +60,7 @@ public class MainController {
         groupListView.setItems(initgroups());
         groupListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         groupListView.getSelectionModel().selectedItemProperty().addListener((observableValue, previousValue, nextValue) -> {
+            stopAllMedias();
             medias.clear();
             playBtn.setDisable(true);
             stopBtn.setDisable(true);
@@ -162,6 +163,10 @@ public class MainController {
     @FXML
     protected void onStopClick()
     {
+        stopAllMedias();
+    }
+
+    private void stopAllMedias() {
         for (MediaPlayer mediaplayer: medias.values()) {
             mediaplayer.stop();
         }
