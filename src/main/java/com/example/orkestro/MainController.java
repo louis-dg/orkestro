@@ -1,17 +1,17 @@
 package com.example.orkestro;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 
+import javax.swing.*;
 import java.io.File;
-import java.net.URISyntaxException;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,8 +36,7 @@ public class MainController {
 
     private Map<String, MediaPlayer> medias = new HashMap<>();
 
-    private static final File BASE_DIR = initBaseDir();
-    private static final String TRACKS_DIRNAME = "tracks";
+    private static File BASE_DIR = null;
     private static final double DEFAULT_VOLUME = 0.5d;
 
     // Déplacement getMediaplayer().seek(Duration.minutes(1));
@@ -52,58 +51,42 @@ public class MainController {
                 playBtn.setDisable(false);
                 stopBtn.setDisable(false);
             }
-
-            // build medias map
-            File tracksDir = new File(BASE_DIR + File.separator + groupListView.getSelectionModel().getSelectedItem()
-                    + File.separator + tracksListView.getSelectionModel().getSelectedItem());
-            medias.clear();
-            try {
-                for (File trackFile : tracksDir.listFiles()) {
-                    //getClass().getResource("tracks/gojira/Sphinx/08 Sphinx_bass_mixed.mp3")
-                    // use "/" because Media doesn't accept "\"
-                    Media media = new Media(getClass().getResource(TRACKS_DIRNAME + "/" + groupListView.getSelectionModel().getSelectedItem() + "/"
-                            + tracksListView.getSelectionModel().getSelectedItem() + "/" + trackFile.getName()).toURI().toString());
-                    medias.put(trackFile.getName(), new MediaPlayer(media));
-                }
-            } catch (URISyntaxException e) {
-                throw new RuntimeException(e);
+            if (tracksListView.getSelectionModel().getSelectedItem() != null){
+                updateMediaMap(groupListView.getSelectionModel().getSelectedItem(), tracksListView.getSelectionModel().getSelectedItem());
             }
-
-            // update sliders
-            tracksPane.getChildren().clear();
-            for (Map.Entry<String, MediaPlayer> entry : medias.entrySet()) {
-                tracksPane.getChildren().add(new Label(entry.getKey()));
-                tracksPane.getChildren().add(buildSlider(entry.getValue()));
-            }
+            updatePlayerGUI();
         });
 
         groupListView.setItems(initgroups());
         groupListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-        groupListView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
-            @Override
-            public void changed(ObservableValue<? extends String> observableValue, String previousValue, String nextValue) {
-                File dir = new File(BASE_DIR.getAbsolutePath() + File.separator + nextValue);
-                ObservableList<String> list = buildTrackslist(dir);
-                tracksListView.setItems(list);
-            }
+        groupListView.getSelectionModel().selectedItemProperty().addListener((observableValue, previousValue, nextValue) -> {
+            medias.clear();
+            File groupDir = new File(BASE_DIR.getAbsolutePath() + File.separator + nextValue);
+            ObservableList<String> list = buildTrackslist(groupDir);
+            tracksListView.setItems(list);
         });
     }
 
+    /**
+     * @return a list of sudirectories (representing the list of music groups) of base directory
+     */
     private ObservableList<String> initgroups()
     {
         List<String> groupDirectories = new ArrayList<>();
-        for (File file : BASE_DIR.listFiles()) {
-            if(file.isDirectory()) {
-                groupDirectories.add(file.getName());
+        if (BASE_DIR != null) {
+            for (File file : BASE_DIR.listFiles()) {
+                if(file.isDirectory()) {
+                    groupDirectories.add(file.getName());
+                }
             }
         }
         return FXCollections.observableArrayList(groupDirectories);
     }
 
-    private ObservableList<String> buildTrackslist(File dir)
+    private ObservableList<String> buildTrackslist(File groupDir)
     {
         List<String> tracks = new ArrayList<>();
-        for (File file : dir.listFiles()) {
+        for (File file : groupDir.listFiles()) {
             if(file.isDirectory()) {
                 tracks.add(file.getName());
             }
@@ -111,11 +94,41 @@ public class MainController {
         return FXCollections.observableArrayList(tracks);
     }
 
-    private static File initBaseDir() {
+    private void initBaseDir() {
+        JFileChooser jfc = new JFileChooser();
+        jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        int returnValue = jfc.showOpenDialog(null);
+
+        if (returnValue == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = jfc.getSelectedFile();
+            if (selectedFile.isDirectory()){
+                BASE_DIR = selectedFile;
+            }
+        }
+    }
+
+    private void updateMediaMap(String group, String track) {
+        // build medias map
+        medias.clear();
         try {
-            return new File(MainController.class.getResource(TRACKS_DIRNAME).toURI());
-        } catch (URISyntaxException e) {
+            if (BASE_DIR != null) {
+                File mediasDir = new File(BASE_DIR + File.separator + group + File.separator + track);
+                for (File mediaFile : mediasDir.listFiles()) {
+                    Media media = new Media(mediaFile.toURI().toURL().toString());
+                    medias.put(mediaFile.getName(), new MediaPlayer(media));
+                }
+            }
+        } catch (MalformedURLException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private void updatePlayerGUI() {
+        // update sliders
+        tracksPane.getChildren().clear();
+        for (Map.Entry<String, MediaPlayer> entry : medias.entrySet()) {
+            tracksPane.getChildren().add(new Label(entry.getKey()));
+            tracksPane.getChildren().add(buildSlider(entry.getValue()));
         }
     }
 
@@ -148,4 +161,10 @@ public class MainController {
         }
     }
 
+    public void onMusicFolderClick(ActionEvent actionEvent) {
+        initBaseDir();
+        groupListView.getItems().clear();
+        groupListView.setItems(initgroups());
+        updatePlayerGUI();
+    }
 }
