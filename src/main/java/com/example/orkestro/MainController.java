@@ -61,6 +61,8 @@ public class MainController {
         groupListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         groupListView.getSelectionModel().selectedItemProperty().addListener((observableValue, previousValue, nextValue) -> {
             medias.clear();
+            playBtn.setDisable(true);
+            stopBtn.setDisable(true);
             File groupDir = new File(BASE_DIR.getAbsolutePath() + File.separator + nextValue);
             ObservableList<String> list = buildTrackslist(groupDir);
             tracksListView.setItems(list);
@@ -83,6 +85,10 @@ public class MainController {
         return FXCollections.observableArrayList(groupDirectories);
     }
 
+    /**
+     * @param groupDir the group directory
+     * @return the list of tracks names from a group directory
+     */
     private ObservableList<String> buildTrackslist(File groupDir)
     {
         List<String> tracks = new ArrayList<>();
