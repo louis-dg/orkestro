@@ -35,12 +35,24 @@ public class MainController {
 
     private Map<String, MediaPlayer> medias = new HashMap<>();
     private boolean isPlaying = false;
+    private Slider timeSlider = new Slider(0, 1, 0);
     private static File BASE_DIR = null;
     private static final double DEFAULT_VOLUME = 0.5d;
 
     //https://docs.oracle.com/javase/8/javafx/api/javafx/fxml/doc-files/introduction_to_fxml.html#controllers
     @FXML
     public void initialize() {
+        // on click, go to the corresponding time of the audio file
+        timeSlider.setOnMouseClicked(event -> {
+            timeSlider.setValueChanging(true);
+            double value = (event.getX()/timeSlider.getWidth())*timeSlider.getMax();
+            timeSlider.setValue(value);
+            for (MediaPlayer mediaplayer: medias.values()) {
+                mediaplayer.seek(Duration.millis(value));
+            }
+            timeSlider.setValueChanging(false);
+        });
+
         tracksListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         tracksListView.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
             if(newValue != null){
@@ -115,9 +127,18 @@ public class MainController {
         try {
             if (BASE_DIR != null) {
                 File mediasDir = new File(BASE_DIR + File.separator + group + File.separator + track);
+                boolean first = true;
                 for (File mediaFile : mediasDir.listFiles()) {
                     Media media = new Media(mediaFile.toURI().toURL().toString());
-                    medias.put(mediaFile.getName(), new MediaPlayer(media));
+                    MediaPlayer mediaPlayer = new MediaPlayer(media);
+                    // all media must have the same time duration, so we take any of them to manage the progress on the time slider
+                    if (first){
+                        first = false;
+                        mediaPlayer.currentTimeProperty().addListener((observableValue, oldDuration, newDuration) -> {
+                            timeSlider.setValue(mediaPlayer.getCurrentTime().toMillis());
+                        });
+                    }
+                    medias.put(mediaFile.getName(), mediaPlayer);
                 }
             }
         } catch (MalformedURLException e) {
@@ -130,8 +151,9 @@ public class MainController {
         tracksPane.getChildren().clear();
         for (Map.Entry<String, MediaPlayer> entry : medias.entrySet()) {
             tracksPane.getChildren().add(new Label(entry.getKey()));
-            tracksPane.getChildren().add(buildSlider(entry.getValue()));
+            tracksPane.getChildren().add(buildVolumeSlider(entry.getValue()));
         }
+        tracksPane.getChildren().add(timeSlider);
     }
 
     @FXML
@@ -141,10 +163,11 @@ public class MainController {
             stopAllMedias();
         } else {
             playAllMedias();
+            updateTimer();
         }
     }
 
-    private Slider buildSlider(MediaPlayer mediaPlayer) {
+    private Slider buildVolumeSlider(MediaPlayer mediaPlayer) {
         Slider slider = new Slider(0, 1 ,DEFAULT_VOLUME);
         slider.setShowTickMarks(true);
         slider.setShowTickLabels(true);
@@ -154,6 +177,13 @@ public class MainController {
             mediaPlayer.setVolume(newValue.doubleValue());
         });
         return slider;
+    }
+
+    private void updateTimer(){
+        MediaPlayer mediaPlayer = medias.values().iterator().next();
+        if (mediaPlayer != null && !Double.isNaN(mediaPlayer.getTotalDuration().toMillis())){
+            timeSlider.setMax(mediaPlayer.getTotalDuration().toMillis());
+        }
     }
 
     private void playAllMedias() {
@@ -184,7 +214,6 @@ public class MainController {
         initBaseDir();
         groupListView.getItems().clear();
         groupListView.setItems(initgroups());
-        updatePlayerGUI();
     }
 
     @FXML
