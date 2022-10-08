@@ -8,6 +8,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import javafx.util.Duration;
 
 import javax.swing.*;
 import java.io.File;
@@ -21,23 +22,21 @@ public class MainController {
 
     @FXML
     public Button playBtn;
-
+    @FXML
+    public Button forwardBtn;
+    @FXML
+    public Button rewindBtn;
     @FXML
     private VBox tracksPane = new VBox();
-
     @FXML
     private ListView<String> groupListView = new ListView<>();
-
     @FXML
     private ListView<String> tracksListView = new ListView<>();
 
     private Map<String, MediaPlayer> medias = new HashMap<>();
     private boolean isPlaying = false;
-
     private static File BASE_DIR = null;
     private static final double DEFAULT_VOLUME = 0.5d;
-
-    // Déplacement getMediaplayer().seek(Duration.minutes(1));
 
     //https://docs.oracle.com/javase/8/javafx/api/javafx/fxml/doc-files/introduction_to_fxml.html#controllers
     @FXML
@@ -45,7 +44,7 @@ public class MainController {
         tracksListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         tracksListView.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
             if(newValue != null){
-                playBtn.setDisable(false);
+                setControlButonsDisable(false);
                 stopAllMedias();
             }
             if (tracksListView.getSelectionModel().getSelectedItem() != null){
@@ -59,7 +58,7 @@ public class MainController {
         groupListView.getSelectionModel().selectedItemProperty().addListener((observableValue, previousValue, nextValue) -> {
             stopAllMedias();
             medias.clear();
-            playBtn.setDisable(true);
+            setControlButonsDisable(true);
             File groupDir = new File(BASE_DIR.getAbsolutePath() + File.separator + nextValue);
             ObservableList<String> list = buildTrackslist(groupDir);
             tracksListView.setItems(list);
@@ -174,10 +173,32 @@ public class MainController {
         }
     }
 
+    private void setControlButonsDisable(boolean disable) {
+        playBtn.setDisable(disable);
+        forwardBtn.setDisable(disable);
+        rewindBtn.setDisable(disable);
+    }
+
+    @FXML
     public void onMusicFolderClick(ActionEvent actionEvent) {
         initBaseDir();
         groupListView.getItems().clear();
         groupListView.setItems(initgroups());
         updatePlayerGUI();
     }
+
+    @FXML
+    public void onForwardClick(ActionEvent actionEvent) {
+        for (MediaPlayer mediaplayer: medias.values()) {
+            mediaplayer.seek(mediaplayer.getCurrentTime().add(Duration.seconds(5)));
+        }
+    }
+
+    @FXML
+    public void onRewindClick(ActionEvent actionEvent) {
+        for (MediaPlayer mediaplayer: medias.values()) {
+            mediaplayer.seek(mediaplayer.getCurrentTime().subtract(Duration.seconds(5)));
+        }
+    }
+
 }
