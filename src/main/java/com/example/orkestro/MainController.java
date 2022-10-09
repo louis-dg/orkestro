@@ -60,13 +60,13 @@ public class MainController {
 
         groupListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         groupListView.getSelectionModel().selectedItemProperty().addListener((observableValue, previousValue, nextValue) -> {
-            tracksPane.getChildren().clear();
             stopAllMedias();
             medias.clear();
             setControlButonsDisable(true);
             File groupDir = new File(BASE_DIR.getAbsolutePath() + File.separator + nextValue);
             ObservableList<String> list = buildTrackslist(groupDir);
             tracksListView.setItems(list);
+            tracksPane.getChildren().clear();
         });
     }
 
