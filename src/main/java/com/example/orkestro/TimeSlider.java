@@ -37,6 +37,7 @@ public class TimeSlider extends HBox {
         Double current = mediaPlayer.getCurrentTime().toMillis();
         if (mediaPlayer != null && !Double.isNaN(max)) {
             slider.setMax(max);
+            slider.setValue(current);
             label.setText(getTimeFromDouble(current) + "/" + getTimeFromDouble(max));
         }
     }
