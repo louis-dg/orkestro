@@ -176,6 +176,7 @@ public class MainController {
     private void playAllMedias() {
         isPlaying = true;
         playBtn.setText("Stop");
+        setFwrRwdButonsDisable(false);
         for (MediaPlayer mediaplayer: medias.values()) {
             mediaplayer.setVolume(DEFAULT_VOLUME);
             mediaplayer.play();
@@ -185,6 +186,7 @@ public class MainController {
     private void stopAllMedias() {
         isPlaying = false;
         playBtn.setText("Lecture");
+        setFwrRwdButonsDisable(true);
         for (MediaPlayer mediaplayer: medias.values()) {
             mediaplayer.stop();
         }
@@ -192,6 +194,10 @@ public class MainController {
 
     private void setControlButonsDisable(boolean disable) {
         playBtn.setDisable(disable);
+        setFwrRwdButonsDisable(disable);
+    }
+
+    private void setFwrRwdButonsDisable(boolean disable) {
         forwardBtn.setDisable(disable);
         rewindBtn.setDisable(disable);
     }
