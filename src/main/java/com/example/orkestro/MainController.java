@@ -182,7 +182,6 @@ public class MainController {
         playBtn.setText("Stop");
         setFwrRwdButonsDisable(false);
         for (MediaPlayer mediaplayer: medias.values()) {
-            mediaplayer.setVolume(DEFAULT_VOLUME);
             mediaplayer.play();
         }
     }
