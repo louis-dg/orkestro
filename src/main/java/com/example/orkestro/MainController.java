@@ -35,24 +35,13 @@ public class MainController {
 
     private Map<String, MediaPlayer> medias = new HashMap<>();
     private boolean isPlaying = false;
-    private Slider timeSlider = new Slider(0, 1, 0);
+    private TimeSlider timeSlider = new TimeSlider(medias);
     private static File BASE_DIR = null;
     private static final double DEFAULT_VOLUME = 0.5d;
 
     //https://docs.oracle.com/javase/8/javafx/api/javafx/fxml/doc-files/introduction_to_fxml.html#controllers
     @FXML
     public void initialize() {
-        // on click, go to the corresponding time of the audio file
-        timeSlider.setOnMouseClicked(event -> {
-            timeSlider.setValueChanging(true);
-            double value = (event.getX()/timeSlider.getWidth())*timeSlider.getMax();
-            timeSlider.setValue(value);
-            for (MediaPlayer mediaplayer: medias.values()) {
-                mediaplayer.seek(Duration.millis(value));
-            }
-            timeSlider.setValueChanging(false);
-        });
-
         tracksListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         tracksListView.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
             if(newValue != null){
@@ -68,6 +57,7 @@ public class MainController {
         groupListView.setItems(initgroups());
         groupListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         groupListView.getSelectionModel().selectedItemProperty().addListener((observableValue, previousValue, nextValue) -> {
+            tracksPane.getChildren().clear();
             stopAllMedias();
             medias.clear();
             setControlButonsDisable(true);
@@ -135,7 +125,7 @@ public class MainController {
                     if (first){
                         first = false;
                         mediaPlayer.currentTimeProperty().addListener((observableValue, oldDuration, newDuration) -> {
-                            timeSlider.setValue(mediaPlayer.getCurrentTime().toMillis());
+                            timeSlider.update(mediaPlayer);
                         });
                     }
                     medias.put(mediaFile.getName(), mediaPlayer);
@@ -149,6 +139,7 @@ public class MainController {
     private void updatePlayerGUI() {
         // update sliders
         tracksPane.getChildren().clear();
+        timeSlider.reset();
         for (Map.Entry<String, MediaPlayer> entry : medias.entrySet()) {
             tracksPane.getChildren().add(new Label(entry.getKey()));
             tracksPane.getChildren().add(buildVolumeSlider(entry.getValue()));
@@ -161,9 +152,12 @@ public class MainController {
     {
         if (isPlaying) {
             stopAllMedias();
+            timeSlider.reset();
         } else {
             playAllMedias();
-            updateTimer();
+            if (medias.values().size() > 0) {
+                timeSlider.update(medias.values().iterator().next());
+            }
         }
     }
 
@@ -177,13 +171,6 @@ public class MainController {
             mediaPlayer.setVolume(newValue.doubleValue());
         });
         return slider;
-    }
-
-    private void updateTimer(){
-        MediaPlayer mediaPlayer = medias.values().iterator().next();
-        if (mediaPlayer != null && !Double.isNaN(mediaPlayer.getTotalDuration().toMillis())){
-            timeSlider.setMax(mediaPlayer.getTotalDuration().toMillis());
-        }
     }
 
     private void playAllMedias() {
