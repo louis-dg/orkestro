@@ -2,10 +2,12 @@ package com.example.orkestro;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
 import javax.swing.*;
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -69,6 +71,16 @@ public class FileManager {
         audioExtension.add("wma");
         audioExtension.add("ogg");
         return Arrays.stream(files).filter(file -> audioExtension.contains(FilenameUtils.getExtension(file.getName()))).collect(Collectors.toList());
+    }
+
+    public void deleteTrackFolder(String group, String track) {
+        File songDir = new File(getBaseDir().getAbsolutePath() + File.separator + group + File.separator + track);
+        try {
+            FileUtils.deleteDirectory(songDir);
+        } catch (IOException e) {
+            System.out.println("Could not delete " + songDir.getAbsolutePath());
+            throw new RuntimeException(e);
+        }
     }
 
     public File getBaseDir() {

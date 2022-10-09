@@ -9,6 +9,7 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Paint;
 import javafx.util.Duration;
+import org.apache.commons.io.FileUtils;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import javax.swing.*;
@@ -245,7 +246,22 @@ public class MainController {
     }
 
     public void onMinusTrackClick(ActionEvent actionEvent) {
-        //TODO
+        String selected = tracksListView.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Veuillez sélectionner un morceau", ButtonType.OK);
+            alert.show();
+        }
+        else {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Voulez vous vraiment supprimer le morceau \"" + selected + "\" ?", ButtonType.YES, ButtonType.NO);
+            alert.showAndWait().ifPresent(response -> {
+                if (response.equals(ButtonType.YES)){
+                    fileManager.deleteTrackFolder(groupListView.getSelectionModel().getSelectedItem(), selected);
+                    tracksListView.getItems().remove(selected);
+                    tracksPane.getChildren().clear();
+                    timeSlider.reset();
+                }
+            });
+        }
     }
 
     public void onAddTrackClick(ActionEvent actionEvent) {
