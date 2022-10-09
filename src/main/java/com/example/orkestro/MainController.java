@@ -1,6 +1,5 @@
 package com.example.orkestro;
 
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -10,7 +9,6 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Paint;
 import javafx.util.Duration;
-import org.apache.commons.io.FilenameUtils;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import javax.swing.*;
@@ -18,8 +16,10 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class MainController {
 
@@ -41,7 +41,7 @@ public class MainController {
     private Map<String, MediaPlayer> medias = new HashMap<>();
     private boolean isPlaying = false;
     private TimeSlider timeSlider = new TimeSlider(medias);
-    private static File BASE_DIR = null;
+    private FileManager fileManager = new FileManager();
     private static final double DEFAULT_VOLUME = 0.5d;
 
     //https://docs.oracle.com/javase/8/javafx/api/javafx/fxml/doc-files/introduction_to_fxml.html#controllers
@@ -64,66 +64,21 @@ public class MainController {
             stopAllMedias();
             medias.clear();
             setControlButonsDisable(true);
-            File groupDir = new File(BASE_DIR.getAbsolutePath() + File.separator + nextValue);
-            ObservableList<String> list = buildTrackslist(groupDir);
+            File groupDir = new File(fileManager.getBaseDir().getAbsolutePath() + File.separator + nextValue);
+            ObservableList<String> list = fileManager.buildTrackslist(groupDir);
             tracksListView.setItems(list);
             tracksPane.getChildren().clear();
         });
-    }
-
-    /**
-     * @return a list of sudirectories (representing the list of music groups) of base directory
-     */
-    private ObservableList<String> initgroups()
-    {
-        List<String> groupDirectories = new ArrayList<>();
-        if (BASE_DIR != null) {
-            for (File file : BASE_DIR.listFiles()) {
-                if(file.isDirectory()) {
-                    groupDirectories.add(file.getName());
-                }
-            }
-        }
-        return FXCollections.observableArrayList(groupDirectories);
-    }
-
-    /**
-     * @param groupDir the group directory
-     * @return the list of tracks names from a group directory
-     */
-    private ObservableList<String> buildTrackslist(File groupDir)
-    {
-        List<String> tracks = new ArrayList<>();
-        for (File file : groupDir.listFiles()) {
-            if(file.isDirectory()) {
-                tracks.add(file.getName());
-            }
-        }
-        return FXCollections.observableArrayList(tracks);
-    }
-
-    private void initBaseDir() {
-        JFileChooser jfc = new JFileChooser();
-        jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        int returnValue = jfc.showOpenDialog(null);
-
-        if (returnValue == JFileChooser.APPROVE_OPTION) {
-            File selectedFile = jfc.getSelectedFile();
-            if (selectedFile.isDirectory()){
-                BASE_DIR = selectedFile;
-                musicImportBtn.setDisable(false);
-            }
-        }
     }
 
     private void updateMediaMap(String group, String track) {
         // build medias map
         medias.clear();
         try {
-            if (BASE_DIR != null) {
-                File mediasDir = new File(BASE_DIR + File.separator + group + File.separator + track);
+            if (fileManager.getBaseDir() != null) {
+                File mediasDir = new File(fileManager.getBaseDir() + File.separator + group + File.separator + track);
                 boolean first = true;
-                for (File mediaFile : getAudioFiles(mediasDir.listFiles())) {
+                for (File mediaFile : fileManager.getAudioFiles(mediasDir.listFiles())) {
                     Media media = new Media(mediaFile.toURI().toURL().toString());
                     MediaPlayer mediaPlayer = new MediaPlayer(media);
                     // all media must have the same time duration, so we take any of them to manage the progress on the time slider
@@ -212,9 +167,12 @@ public class MainController {
 
     @FXML
     public void onMusicFolderClick(ActionEvent actionEvent) {
-        initBaseDir();
+        boolean res = fileManager.initBaseDir();
+        if (res) {
+            musicImportBtn.setDisable(false);
+        }
         groupListView.getItems().clear();
-        groupListView.setItems(initgroups());
+        groupListView.setItems(fileManager.initgroups());
     }
 
     @FXML
@@ -254,14 +212,14 @@ public class MainController {
             }
             int returnValue = jfc.showOpenDialog(null);
             if (returnValue == JFileChooser.APPROVE_OPTION) {
-                List<File> selectedFiles = getAudioFiles(jfc.getSelectedFiles());
-                if (BASE_DIR != null) {
+                List<File> selectedFiles = fileManager.getAudioFiles(jfc.getSelectedFiles());
+                if (fileManager.getBaseDir() != null) {
                     File artistDir;
-                    if (Arrays.stream(BASE_DIR.listFiles()).anyMatch(file -> file.getName().equalsIgnoreCase(artistField.getText()))) {
-                        artistDir = Arrays.stream(BASE_DIR.listFiles()).filter(file -> file.getName().equalsIgnoreCase(artistField.getText())).findFirst().get();
+                    if (Arrays.stream(fileManager.getBaseDir().listFiles()).anyMatch(file -> file.getName().equalsIgnoreCase(artistField.getText()))) {
+                        artistDir = Arrays.stream(fileManager.getBaseDir().listFiles()).filter(file -> file.getName().equalsIgnoreCase(artistField.getText())).findFirst().get();
                     }
                     else {
-                        artistDir = new File(BASE_DIR.getAbsolutePath() + File.separator + artistField.getText());
+                        artistDir = new File(fileManager.getBaseDir().getAbsolutePath() + File.separator + artistField.getText());
                         artistDir.mkdir();
                     }
                     File songDir = new File(artistDir.getAbsolutePath() + File.separator + songNameField.getText());
@@ -277,23 +235,13 @@ public class MainController {
                         }
                     }
                     groupListView.getItems().clear();
-                    groupListView.setItems(initgroups());
+                    groupListView.setItems(fileManager.initgroups());
                 }
             }
         });
 
         dialogPane.setContent(new VBox(8, artistField, songNameField, fileChooserBtn));
         dialog.show();
-    }
-
-    private List<File> getAudioFiles(File[] files) {
-        Set<String> audioExtension = new HashSet<>();
-        audioExtension.add("mp3");
-        audioExtension.add("m4a");
-        audioExtension.add("wav");
-        audioExtension.add("wma");
-        audioExtension.add("ogg");
-        return Arrays.stream(files).filter(file -> audioExtension.contains(FilenameUtils.getExtension(file.getName()))).collect(Collectors.toList());
     }
 
     public void onMinusTrackClick(ActionEvent actionEvent) {
