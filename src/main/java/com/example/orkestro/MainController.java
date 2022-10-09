@@ -8,7 +8,10 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import javafx.scene.paint.Paint;
 import javafx.util.Duration;
+import org.apache.commons.io.FilenameUtils;
+import org.kordamp.ikonli.javafx.FontIcon;
 
 import javax.swing.*;
 import java.io.File;
@@ -17,8 +20,6 @@ import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import org.apache.commons.io.FilenameUtils;
 
 public class MainController {
 
@@ -179,7 +180,9 @@ public class MainController {
 
     private void playAllMedias() {
         isPlaying = true;
-        playBtn.setText("Stop");
+        FontIcon icon = new FontIcon("fa-stop");
+        icon.setIconColor(Paint.valueOf("red"));
+        playBtn.setGraphic(icon);
         setFwrRwdButonsDisable(false);
         for (MediaPlayer mediaplayer: medias.values()) {
             mediaplayer.play();
@@ -188,7 +191,9 @@ public class MainController {
 
     private void stopAllMedias() {
         isPlaying = false;
-        playBtn.setText("Lecture");
+        FontIcon icon = new FontIcon("fa-play");
+        icon.setIconColor(Paint.valueOf("darkgreen"));
+        playBtn.setGraphic(icon);
         setFwrRwdButonsDisable(true);
         for (MediaPlayer mediaplayer: medias.values()) {
             mediaplayer.stop();

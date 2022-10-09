@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.*?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 <HBox alignment="CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.example.orkestro.MainController">
     <padding>
@@ -19,9 +19,21 @@
         <HBox spacing="10">
             <Button fx:id="musicFolderBtn" text="Dossier de musique" onAction="#onMusicFolderClick"/>
             <Button fx:id="musicImportBtn" text="Importer musique" onAction="#onMusicImportClick" disable="true"/>
-            <Button fx:id="rewindBtn" text="-" onAction="#onRewindClick" disable="true"/>
-            <Button fx:id="playBtn" text="Lecture" onAction="#onPlayClick" disable="true"/>
-            <Button fx:id="forwardBtn" text="+" onAction="#onForwardClick" disable="true"/>
+            <Button fx:id="rewindBtn" onAction="#onRewindClick" disable="true">
+                <graphic>
+                    <FontIcon iconLiteral="fa-angle-left"/>
+                </graphic>
+            </Button>
+            <Button fx:id="playBtn" onAction="#onPlayClick" disable="true">
+                <graphic>
+                    <FontIcon iconLiteral="fa-play" iconColor="darkgreen"/>
+                </graphic>
+            </Button>
+            <Button fx:id="forwardBtn" onAction="#onForwardClick" disable="true">
+                <graphic>
+                    <FontIcon iconLiteral="fa-angle-right"/>
+                </graphic>
+            </Button>
         </HBox>
         <VBox spacing="5" fx:id="tracksPane"/>
     </VBox>
