@@ -16,6 +16,9 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.util.*;
+import java.util.stream.Collectors;
+
+import org.apache.commons.io.FilenameUtils;
 
 public class MainController {
 
@@ -119,7 +122,7 @@ public class MainController {
             if (BASE_DIR != null) {
                 File mediasDir = new File(BASE_DIR + File.separator + group + File.separator + track);
                 boolean first = true;
-                for (File mediaFile : mediasDir.listFiles()) {
+                for (File mediaFile : getAudioFiles(mediasDir.listFiles())) {
                     Media media = new Media(mediaFile.toURI().toURL().toString());
                     MediaPlayer mediaPlayer = new MediaPlayer(media);
                     // all media must have the same time duration, so we take any of them to manage the progress on the time slider
@@ -247,7 +250,7 @@ public class MainController {
             }
             int returnValue = jfc.showOpenDialog(null);
             if (returnValue == JFileChooser.APPROVE_OPTION) {
-                File[] selectedFiles = jfc.getSelectedFiles();
+                List<File> selectedFiles = getAudioFiles(jfc.getSelectedFiles());
                 if (BASE_DIR != null) {
                     File artistDir;
                     if (Arrays.stream(BASE_DIR.listFiles()).anyMatch(file -> file.getName().equalsIgnoreCase(artistField.getText()))) {
@@ -277,5 +280,15 @@ public class MainController {
 
         dialogPane.setContent(new VBox(8, artistField, songNameField, fileChooserBtn));
         dialog.show();
+    }
+
+    private List<File> getAudioFiles(File[] files) {
+        Set<String> audioExtension = new HashSet<>();
+        audioExtension.add("mp3");
+        audioExtension.add("m4a");
+        audioExtension.add("wav");
+        audioExtension.add("wma");
+        audioExtension.add("ogg");
+        return Arrays.stream(files).filter(file -> audioExtension.contains(FilenameUtils.getExtension(file.getName()))).collect(Collectors.toList());
     }
 }
