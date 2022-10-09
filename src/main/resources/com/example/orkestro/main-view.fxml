@@ -15,7 +15,7 @@
 
     <ListView fx:id="tracksListView"/>
 
-    <VBox prefWidth="400">
+    <VBox prefWidth="400" spacing="20">
         <HBox spacing="10">
             <Button fx:id="musicFolderBtn" text="Dossier de musique" onAction="#onMusicFolderClick"/>
             <Button fx:id="rewindBtn" text="-" onAction="#onRewindClick" disable="true"/>
