@@ -295,4 +295,20 @@ public class MainController {
         audioExtension.add("ogg");
         return Arrays.stream(files).filter(file -> audioExtension.contains(FilenameUtils.getExtension(file.getName()))).collect(Collectors.toList());
     }
+
+    public void onMinusTrackClick(ActionEvent actionEvent) {
+        //TODO
+    }
+
+    public void onAddTrackClick(ActionEvent actionEvent) {
+        //TODO
+    }
+
+    public void onMinusGroupClick(ActionEvent actionEvent) {
+        //TODO
+    }
+
+    public void onAddGroupClick(ActionEvent actionEvent) {
+        //TODO
+    }
 }

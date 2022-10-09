@@ -11,7 +11,7 @@ public class OrkestroApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(OrkestroApplication.class.getResource("main-view.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 1000, 600);
+        Scene scene = new Scene(fxmlLoader.load());
         stage.setTitle("Orkestro");
         stage.setScene(scene);
         stage.show();
