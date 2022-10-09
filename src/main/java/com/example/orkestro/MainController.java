@@ -12,11 +12,10 @@ import javafx.util.Duration;
 
 import javax.swing.*;
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.nio.file.Files;
+import java.util.*;
 
 public class MainController {
 
@@ -26,6 +25,8 @@ public class MainController {
     public Button forwardBtn;
     @FXML
     public Button rewindBtn;
+    @FXML
+    public Button musicImportBtn;
     @FXML
     private VBox tracksPane = new VBox();
     @FXML
@@ -54,7 +55,6 @@ public class MainController {
             updatePlayerGUI();
         });
 
-        groupListView.setItems(initgroups());
         groupListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         groupListView.getSelectionModel().selectedItemProperty().addListener((observableValue, previousValue, nextValue) -> {
             tracksPane.getChildren().clear();
@@ -107,6 +107,7 @@ public class MainController {
             File selectedFile = jfc.getSelectedFile();
             if (selectedFile.isDirectory()){
                 BASE_DIR = selectedFile;
+                musicImportBtn.setDisable(false);
             }
         }
     }
@@ -223,4 +224,58 @@ public class MainController {
         }
     }
 
+    public void onMusicImportClick(ActionEvent actionEvent) {
+        Dialog dialog = new Dialog<>();
+        dialog.setTitle("Import de musique");
+        DialogPane dialogPane = dialog.getDialogPane();
+        dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+        TextField artistField = new TextField();
+        artistField.setPromptText("Artiste");
+        TextField songNameField = new TextField();
+        songNameField.setPromptText("Nom du morceau");
+
+        JFileChooser jfc = new JFileChooser();
+        jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        jfc.setMultiSelectionEnabled(true);
+
+        Button fileChooserBtn = new Button("Select. fichiers");
+        fileChooserBtn.setOnAction(event -> {
+            if (artistField.getText().isBlank() || songNameField.getText().isBlank()) {
+                Alert alert = new Alert(Alert.AlertType.ERROR, "Le nom d'artiste et le nom de morceau ne peuvent pas être vides", ButtonType.OK);
+                alert.show();
+                //TODO : sanitize input names
+            }
+            int returnValue = jfc.showOpenDialog(null);
+            if (returnValue == JFileChooser.APPROVE_OPTION) {
+                File[] selectedFiles = jfc.getSelectedFiles();
+                if (BASE_DIR != null) {
+                    File artistDir;
+                    if (Arrays.stream(BASE_DIR.listFiles()).anyMatch(file -> file.getName().equalsIgnoreCase(artistField.getText()))) {
+                        artistDir = Arrays.stream(BASE_DIR.listFiles()).filter(file -> file.getName().equalsIgnoreCase(artistField.getText())).findFirst().get();
+                    }
+                    else {
+                        artistDir = new File(BASE_DIR.getAbsolutePath() + File.separator + artistField.getText());
+                        artistDir.mkdir();
+                    }
+                    File songDir = new File(artistDir.getAbsolutePath() + File.separator + songNameField.getText());
+                    if (songDir.exists()){
+                        songDir.delete();
+                    }
+                    songDir.mkdir();
+                    for (File newAudioFile : selectedFiles) {
+                        try {
+                            Files.copy(newAudioFile.toPath(), new File(songDir.getAbsolutePath() + File.separator + newAudioFile.getName()).toPath());
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                    groupListView.getItems().clear();
+                    groupListView.setItems(initgroups());
+                }
+            }
+        });
+
+        dialogPane.setContent(new VBox(8, artistField, songNameField, fileChooserBtn));
+        dialog.show();
+    }
 }

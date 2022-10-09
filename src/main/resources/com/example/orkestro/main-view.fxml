@@ -18,6 +18,7 @@
     <VBox prefWidth="400" spacing="20">
         <HBox spacing="10">
             <Button fx:id="musicFolderBtn" text="Dossier de musique" onAction="#onMusicFolderClick"/>
+            <Button fx:id="musicImportBtn" text="Importer musique" onAction="#onMusicImportClick" disable="true"/>
             <Button fx:id="rewindBtn" text="-" onAction="#onRewindClick" disable="true"/>
             <Button fx:id="playBtn" text="Lecture" onAction="#onPlayClick" disable="true"/>
             <Button fx:id="forwardBtn" text="+" onAction="#onForwardClick" disable="true"/>
