@@ -74,21 +74,20 @@ public class FileManager {
     }
 
     public void deleteTrackFolder(String group, String track) {
-        File songDir = new File(getBaseDir().getAbsolutePath() + File.separator + group + File.separator + track);
-        try {
-            FileUtils.deleteDirectory(songDir);
-        } catch (IOException e) {
-            System.out.println("Could not delete " + songDir.getAbsolutePath());
-            throw new RuntimeException(e);
-        }
+        File trackDir = new File(getGroupDir(group) + File.separator + track);
+        deleteFolder(trackDir);
     }
 
     public void deleteGroupFolder(String group) {
         File groupDir = getGroupDir(group);
+        deleteFolder(groupDir);
+    }
+
+    public void deleteFolder(File file) {
         try {
-            FileUtils.deleteDirectory(groupDir);
+            FileUtils.deleteDirectory(file);
         } catch (IOException e) {
-            System.out.println("Could not delete " + groupDir.getAbsolutePath());
+            System.out.println("Could not delete " + file.getAbsolutePath());
             throw new RuntimeException(e);
         }
     }
