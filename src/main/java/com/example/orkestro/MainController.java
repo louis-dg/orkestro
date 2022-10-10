@@ -9,7 +9,6 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Paint;
 import javafx.util.Duration;
-import org.apache.commons.io.FileUtils;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import javax.swing.*;
@@ -17,10 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class MainController {
 
@@ -30,8 +26,6 @@ public class MainController {
     public Button forwardBtn;
     @FXML
     public Button rewindBtn;
-    @FXML
-    public Button musicImportBtn;
     @FXML
     private VBox tracksPane = new VBox();
     @FXML
@@ -65,9 +59,7 @@ public class MainController {
             stopAllMedias();
             medias.clear();
             setControlButonsDisable(true);
-            File groupDir = new File(fileManager.getBaseDir().getAbsolutePath() + File.separator + nextValue);
-            ObservableList<String> list = fileManager.buildTrackslist(groupDir);
-            tracksListView.setItems(list);
+            updateTrackListView(nextValue);
             tracksPane.getChildren().clear();
         });
     }
@@ -95,6 +87,11 @@ public class MainController {
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private void updateTrackListView(String group) {
+        ObservableList<String> list = fileManager.buildTrackslist(fileManager.getGroupDir(group));
+        tracksListView.setItems(list);
     }
 
     private void updatePlayerGUI() {
@@ -168,10 +165,7 @@ public class MainController {
 
     @FXML
     public void onMusicFolderClick(ActionEvent actionEvent) {
-        boolean res = fileManager.initBaseDir();
-        if (res) {
-            musicImportBtn.setDisable(false);
-        }
+        fileManager.initBaseDir();
         groupListView.getItems().clear();
         groupListView.setItems(fileManager.initgroups());
     }
@@ -190,13 +184,46 @@ public class MainController {
         }
     }
 
-    public void onMusicImportClick(ActionEvent actionEvent) {
+    @FXML
+    public void onAddGroupClick(ActionEvent actionEvent) {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Ajouter un groupe");
+        dialog.setHeaderText("Ajouter un groupe");
+        dialog.setContentText("Nom du groupe : ");
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(name -> {
+            groupListView.getItems().add(name);
+            fileManager.getGroupDir(name).mkdir();
+        });
+    }
+
+    @FXML
+    public void onMinusGroupClick(ActionEvent actionEvent) {
+        String selected = groupListView.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Veuillez sélectionner un groupe", ButtonType.OK);
+            alert.show();
+        } else {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Voulez vous vraiment supprimer le groupe \"" + selected + "\" ?", ButtonType.YES, ButtonType.NO);
+            alert.showAndWait().ifPresent(response -> {
+                if (response.equals(ButtonType.YES)){
+                    fileManager.deleteGroupFolder(selected);
+                    groupListView.getItems().remove(selected);
+                    tracksPane.getChildren().clear();
+                    tracksPane.getChildren().clear();
+                    timeSlider.reset();
+                }
+            });
+        }
+    }
+
+    @FXML
+    public void onAddTrackClick(ActionEvent actionEvent) {
         Dialog dialog = new Dialog<>();
         dialog.setTitle("Import de musique");
         DialogPane dialogPane = dialog.getDialogPane();
         dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
-        TextField artistField = new TextField();
-        artistField.setPromptText("Artiste");
+        String artist = groupListView.getSelectionModel().getSelectedItem();
         TextField songNameField = new TextField();
         songNameField.setPromptText("Nom du morceau");
 
@@ -206,7 +233,7 @@ public class MainController {
 
         Button fileChooserBtn = new Button("Select. fichiers");
         fileChooserBtn.setOnAction(event -> {
-            if (artistField.getText().isBlank() || songNameField.getText().isBlank()) {
+            if (artist.isBlank() || songNameField.getText().isBlank()) {
                 Alert alert = new Alert(Alert.AlertType.ERROR, "Le nom d'artiste et le nom de morceau ne peuvent pas être vides", ButtonType.OK);
                 alert.show();
                 //TODO : sanitize input names
@@ -216,11 +243,11 @@ public class MainController {
                 List<File> selectedFiles = fileManager.getAudioFiles(jfc.getSelectedFiles());
                 if (fileManager.getBaseDir() != null) {
                     File artistDir;
-                    if (Arrays.stream(fileManager.getBaseDir().listFiles()).anyMatch(file -> file.getName().equalsIgnoreCase(artistField.getText()))) {
-                        artistDir = Arrays.stream(fileManager.getBaseDir().listFiles()).filter(file -> file.getName().equalsIgnoreCase(artistField.getText())).findFirst().get();
+                    if (Arrays.stream(fileManager.getBaseDir().listFiles()).anyMatch(file -> file.getName().equalsIgnoreCase(artist))) {
+                        artistDir = Arrays.stream(fileManager.getBaseDir().listFiles()).filter(file -> file.getName().equalsIgnoreCase(artist)).findFirst().get();
                     }
                     else {
-                        artistDir = new File(fileManager.getBaseDir().getAbsolutePath() + File.separator + artistField.getText());
+                        artistDir = new File(fileManager.getBaseDir().getAbsolutePath() + File.separator + artist);
                         artistDir.mkdir();
                     }
                     File songDir = new File(artistDir.getAbsolutePath() + File.separator + songNameField.getText());
@@ -241,17 +268,17 @@ public class MainController {
             }
         });
 
-        dialogPane.setContent(new VBox(8, artistField, songNameField, fileChooserBtn));
+        dialogPane.setContent(new VBox(8, songNameField, fileChooserBtn));
         dialog.show();
     }
 
+    @FXML
     public void onMinusTrackClick(ActionEvent actionEvent) {
         String selected = tracksListView.getSelectionModel().getSelectedItem();
         if (selected == null) {
             Alert alert = new Alert(Alert.AlertType.ERROR, "Veuillez sélectionner un morceau", ButtonType.OK);
             alert.show();
-        }
-        else {
+        } else {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Voulez vous vraiment supprimer le morceau \"" + selected + "\" ?", ButtonType.YES, ButtonType.NO);
             alert.showAndWait().ifPresent(response -> {
                 if (response.equals(ButtonType.YES)){
@@ -264,15 +291,4 @@ public class MainController {
         }
     }
 
-    public void onAddTrackClick(ActionEvent actionEvent) {
-        //TODO
-    }
-
-    public void onMinusGroupClick(ActionEvent actionEvent) {
-        //TODO
-    }
-
-    public void onAddGroupClick(ActionEvent actionEvent) {
-        //TODO
-    }
 }

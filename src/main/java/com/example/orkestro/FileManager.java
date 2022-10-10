@@ -83,6 +83,20 @@ public class FileManager {
         }
     }
 
+    public void deleteGroupFolder(String group) {
+        File groupDir = getGroupDir(group);
+        try {
+            FileUtils.deleteDirectory(groupDir);
+        } catch (IOException e) {
+            System.out.println("Could not delete " + groupDir.getAbsolutePath());
+            throw new RuntimeException(e);
+        }
+    }
+
+    public File getGroupDir(String group) {
+        return new File(getBaseDir().getAbsolutePath() + File.separator + group);
+    }
+
     public File getBaseDir() {
         return baseDir;
     }

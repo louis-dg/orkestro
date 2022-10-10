@@ -47,7 +47,6 @@
     <VBox GridPane.columnIndex="2" GridPane.rowIndex="0">
         <HBox spacing="10">
             <Button fx:id="musicFolderBtn" text="Dossier de musique" onAction="#onMusicFolderClick"/>
-            <Button fx:id="musicImportBtn" text="Importer musique" onAction="#onMusicImportClick" disable="true"/>
             <Button fx:id="rewindBtn" onAction="#onRewindClick" disable="true">
                 <graphic>
                     <FontIcon iconLiteral="fa-angle-left"/>
