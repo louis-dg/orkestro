@@ -8,6 +8,7 @@ import org.apache.commons.io.FilenameUtils;
 import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -89,6 +90,27 @@ public class FileManager {
         } catch (IOException e) {
             System.out.println("Could not delete " + file.getAbsolutePath());
             throw new RuntimeException(e);
+        }
+    }
+
+    public void importTracks(List<File> selectedFiles, String artist, String track) {
+        if (getBaseDir() != null) {
+            File artistDir = getGroupDir(artist);
+            if (!artistDir.exists()) {
+                artistDir.mkdirs();
+            }
+            File songDir = getTrackDir(artist, track);
+            if (songDir.exists()){
+                songDir.delete();
+            }
+            songDir.mkdir();
+            for (File newAudioFile : selectedFiles) {
+                try {
+                    Files.copy(newAudioFile.toPath(), new File(songDir.getAbsolutePath() + File.separator + newAudioFile.getName()).toPath());
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
     }
 

@@ -13,10 +13,11 @@ import org.kordamp.ikonli.javafx.FontIcon;
 
 import javax.swing.*;
 import java.io.File;
-import java.io.IOException;
 import java.net.MalformedURLException;
-import java.nio.file.Files;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public class MainController {
 
@@ -219,57 +220,39 @@ public class MainController {
 
     @FXML
     public void onAddTrackClick(ActionEvent actionEvent) {
-        Dialog dialog = new Dialog<>();
-        dialog.setTitle("Import de musique");
-        DialogPane dialogPane = dialog.getDialogPane();
-        dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
         String artist = groupListView.getSelectionModel().getSelectedItem();
-        TextField songNameField = new TextField();
-        songNameField.setPromptText("Nom du morceau");
+        if (artist == null) {
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Veuillez sélectionner un groupe", ButtonType.OK);
+            alert.show();
+        } else {
 
-        JFileChooser jfc = new JFileChooser();
-        jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        jfc.setMultiSelectionEnabled(true);
+            List<File> selectedFiles = null;
+            JFileChooser jfc = new JFileChooser();
+            jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            jfc.setMultiSelectionEnabled(true);
+            jfc.setDialogTitle("Selectionnez les fichiers à importer");
 
-        Button fileChooserBtn = new Button("Select. fichiers");
-        fileChooserBtn.setOnAction(event -> {
-            if (artist.isBlank() || songNameField.getText().isBlank()) {
-                Alert alert = new Alert(Alert.AlertType.ERROR, "Le nom d'artiste et le nom de morceau ne peuvent pas être vides", ButtonType.OK);
-                alert.show();
-                //TODO : sanitize input names
-            }
             int returnValue = jfc.showOpenDialog(null);
             if (returnValue == JFileChooser.APPROVE_OPTION) {
-                List<File> selectedFiles = fileManager.getAudioFiles(jfc.getSelectedFiles());
-                if (fileManager.getBaseDir() != null) {
-                    File artistDir;
-                    if (Arrays.stream(fileManager.getBaseDir().listFiles()).anyMatch(file -> file.getName().equalsIgnoreCase(artist))) {
-                        artistDir = Arrays.stream(fileManager.getBaseDir().listFiles()).filter(file -> file.getName().equalsIgnoreCase(artist)).findFirst().get();
-                    }
-                    else {
-                        artistDir = fileManager.getGroupDir(artist);
-                        artistDir.mkdir();
-                    }
-                    File songDir = fileManager.getTrackDir(artist, songNameField.getText());
-                    if (songDir.exists()){
-                        songDir.delete();
-                    }
-                    songDir.mkdir();
-                    for (File newAudioFile : selectedFiles) {
-                        try {
-                            Files.copy(newAudioFile.toPath(), new File(songDir.getAbsolutePath() + File.separator + newAudioFile.getName()).toPath());
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-                    groupListView.getItems().clear();
-                    groupListView.setItems(fileManager.initgroups());
-                }
+                selectedFiles = fileManager.getAudioFiles(jfc.getSelectedFiles());
             }
-        });
 
-        dialogPane.setContent(new VBox(8, songNameField, fileChooserBtn));
-        dialog.show();
+            //TODO : sanitize input names
+            TextInputDialog dialog = new TextInputDialog();
+            dialog.setTitle("Ajouter un morceau");
+            dialog.setHeaderText("Nom un morceau");
+            Optional<String> result = dialog.showAndWait();
+            List<File> finalSelectedFiles = selectedFiles;
+            result.ifPresent(name -> {
+                if (name.isBlank()) {
+                    Alert alert = new Alert(Alert.AlertType.ERROR, "Le nom de morceau ne peut pas être vide", ButtonType.OK);
+                    alert.show();
+                    return;
+                }
+                fileManager.importTracks(finalSelectedFiles, artist, name);
+                updateTrackListView(artist);
+            });
+        }
     }
 
     @FXML
