@@ -69,7 +69,7 @@ public class MainController {
         medias.clear();
         try {
             if (fileManager.getBaseDir() != null) {
-                File mediasDir = new File(fileManager.getBaseDir() + File.separator + group + File.separator + track);
+                File mediasDir = fileManager.getTrackDir(group, track);
                 boolean first = true;
                 for (File mediaFile : fileManager.getAudioFiles(mediasDir.listFiles())) {
                     Media media = new Media(mediaFile.toURI().toURL().toString());
@@ -247,10 +247,10 @@ public class MainController {
                         artistDir = Arrays.stream(fileManager.getBaseDir().listFiles()).filter(file -> file.getName().equalsIgnoreCase(artist)).findFirst().get();
                     }
                     else {
-                        artistDir = new File(fileManager.getBaseDir().getAbsolutePath() + File.separator + artist);
+                        artistDir = fileManager.getGroupDir(artist);
                         artistDir.mkdir();
                     }
-                    File songDir = new File(artistDir.getAbsolutePath() + File.separator + songNameField.getText());
+                    File songDir = fileManager.getTrackDir(artist, songNameField.getText());
                     if (songDir.exists()){
                         songDir.delete();
                     }

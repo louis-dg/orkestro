@@ -74,7 +74,7 @@ public class FileManager {
     }
 
     public void deleteTrackFolder(String group, String track) {
-        File trackDir = new File(getGroupDir(group) + File.separator + track);
+        File trackDir = getTrackDir(group, track);
         deleteFolder(trackDir);
     }
 
@@ -94,6 +94,10 @@ public class FileManager {
 
     public File getGroupDir(String group) {
         return new File(getBaseDir().getAbsolutePath() + File.separator + group);
+    }
+
+    public File getTrackDir(String group, String track) {
+        return new File(getGroupDir(group).getAbsolutePath() + File.separator + track);
     }
 
     public File getBaseDir() {
