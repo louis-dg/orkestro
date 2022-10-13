@@ -9,7 +9,15 @@
 <GridPane alignment="CENTER" xmlns:fx="http://javafx.com/fxml" fx:controller="com.example.orkestro.MainController"
           hgap="10" vgap="10">
 
-    <VBox GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS" GridPane.hgrow="ALWAYS">
+    <MenuBar GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="0" GridPane.hgrow="ALWAYS">
+        <menus>
+            <Menu text="Fichier">
+                <MenuItem text="Dossier principal" onAction="#onBaseFolderClick"/>
+            </Menu>
+        </menus>
+    </MenuBar>
+
+    <VBox GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS" GridPane.hgrow="ALWAYS" minWidth="300" spacing="2">
         <padding>
             <Insets top="10" right="5" bottom="10" left="10"/>
         </padding>
@@ -52,7 +60,6 @@
             <Insets top="10" right="10" bottom="10" left="5"/>
         </padding>
         <HBox spacing="10">
-            <Button fx:id="musicFolderBtn" text="Dossier de musique" onAction="#onMusicFolderClick"/>
             <Button fx:id="rewindBtn" onAction="#onRewindClick" disable="true">
                 <graphic>
                     <FontIcon iconLiteral="fa-angle-left"/>

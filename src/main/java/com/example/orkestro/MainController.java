@@ -168,11 +168,15 @@ public class MainController {
         rewindBtn.setDisable(disable);
     }
 
-    @FXML
-    public void onMusicFolderClick(ActionEvent actionEvent) {
+    private void initBaseFolder() {
         fileManager.initBaseDir();
         groupListView.getItems().clear();
         groupListView.setItems(fileManager.initgroups());
+    }
+
+    @FXML
+    public void onBaseFolderClick(ActionEvent actionEvent) {
+        initBaseFolder();
     }
 
     @FXML
