@@ -3,11 +3,16 @@ package com.example.orkestro;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Paint;
+import javafx.scene.text.Font;
 import javafx.util.Duration;
 import org.kordamp.ikonli.javafx.FontIcon;
 
@@ -102,7 +107,9 @@ public class MainController {
         timeSlider.reset();
         if (medias.entrySet().size() > 0){
             for (Map.Entry<String, MediaPlayer> entry : medias.entrySet()) {
-                tracksPane.getChildren().add(new Label(entry.getKey()));
+                Label lbl = new Label(entry.getKey());
+                lbl.setFont(new Font(13));
+                tracksPane.getChildren().add(lbl);
                 tracksPane.getChildren().add(buildVolumeSlider(entry.getValue()));
             }
             tracksPane.getChildren().add(timeSlider);
@@ -124,7 +131,9 @@ public class MainController {
         }
     }
 
-    private Slider buildVolumeSlider(MediaPlayer mediaPlayer) {
+    private Node buildVolumeSlider(MediaPlayer mediaPlayer) {
+        FlowPane flowPane = new FlowPane(Orientation.HORIZONTAL);
+        flowPane.setAlignment(Pos.CENTER_LEFT);
         Slider slider = new Slider(0, 1 ,DEFAULT_VOLUME);
         slider.setShowTickMarks(true);
         slider.setShowTickLabels(true);
@@ -133,13 +142,21 @@ public class MainController {
         slider.valueProperty().addListener((observableValue, oldValue, newValue) -> {
             mediaPlayer.setVolume(newValue.doubleValue());
         });
-        return slider;
+        slider.setPrefWidth(250);
+        FontIcon icon = new FontIcon("fa-volume-up");
+        icon.setIconSize(20);
+        Label imageLabel = new Label();
+        imageLabel.setGraphic(icon);
+        flowPane.getChildren().add(imageLabel);
+        flowPane.getChildren().add(slider);
+        return flowPane;
     }
 
     private void playAllMedias() {
         isPlaying = true;
-        FontIcon icon = new FontIcon("fa-stop");
-        icon.setIconColor(Paint.valueOf("red"));
+        FontIcon icon = new FontIcon("fa-stop-circle");
+        icon.setIconColor(Paint.valueOf("#bb0000"));
+        icon.setIconSize(25);
         playBtn.setGraphic(icon);
         setFwrRwdButonsDisable(false);
         for (MediaPlayer mediaplayer: medias.values()) {
@@ -149,8 +166,9 @@ public class MainController {
 
     private void stopAllMedias() {
         isPlaying = false;
-        FontIcon icon = new FontIcon("fa-play");
-        icon.setIconColor(Paint.valueOf("darkgreen"));
+        FontIcon icon = new FontIcon("fa-play-circle");
+        icon.setIconColor(Paint.valueOf("#008000"));
+        icon.setIconSize(25);
         playBtn.setGraphic(icon);
         setFwrRwdButonsDisable(true);
         for (MediaPlayer mediaplayer: medias.values()) {
@@ -219,7 +237,6 @@ public class MainController {
                     fileManager.deleteGroupFolder(selected);
                     groupListView.getItems().remove(selected);
                     tracksPane.getChildren().clear();
-                    tracksPane.getChildren().clear();
                     timeSlider.reset();
                 }
             });
@@ -274,7 +291,6 @@ public class MainController {
             alert.showAndWait().ifPresent(response -> {
                 if (response.equals(ButtonType.YES)){
                     stopAllMedias();
-//                    tracksListView.getItems().remove(selected);
                     tracksPane.getChildren().clear();
                     timeSlider.reset();
                     medias.values().stream().forEach(mediaPlayer -> mediaPlayer.dispose()); // MediaPlayer keeps a lock on the file. Use dispose to release it
