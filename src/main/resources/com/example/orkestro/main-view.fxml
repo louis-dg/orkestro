@@ -8,14 +8,14 @@
 <?import javafx.scene.layout.GridPane?>
 <GridPane alignment="CENTER" xmlns:fx="http://javafx.com/fxml" fx:controller="com.example.orkestro.MainController"
           hgap="10" vgap="10">
-    <padding>
-        <Insets top="10" right="10" bottom="10" left="10"/>
-    </padding>
 
-    <VBox GridPane.columnIndex="0" GridPane.rowIndex="0">
+    <VBox GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS" GridPane.hgrow="ALWAYS">
+        <padding>
+            <Insets top="10" right="5" bottom="10" left="10"/>
+        </padding>
         <Label>Groupes</Label>
         <ListView fx:id="groupListView" maxHeight="Infinity"/>
-        <HBox>
+        <HBox >
             <Button fx:id="addGroupBtn" onAction="#onAddGroupClick">
                 <graphic>
                     <FontIcon iconLiteral="fa-plus"/>
@@ -28,7 +28,10 @@
             </Button>
         </HBox>
     </VBox>
-    <VBox GridPane.columnIndex="1" GridPane.rowIndex="0">
+    <VBox GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS" GridPane.hgrow="ALWAYS">
+        <padding>
+            <Insets top="10" right="5" bottom="5" left="10"/>
+        </padding>
         <Label>Morceaux</Label>
         <ListView fx:id="tracksListView"/>
         <HBox>
@@ -44,7 +47,10 @@
             </Button>
         </HBox>
     </VBox>
-    <VBox GridPane.columnIndex="2" GridPane.rowIndex="0">
+    <VBox GridPane.columnIndex="2" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS" GridPane.hgrow="ALWAYS">
+        <padding>
+            <Insets top="10" right="10" bottom="10" left="5"/>
+        </padding>
         <HBox spacing="10">
             <Button fx:id="musicFolderBtn" text="Dossier de musique" onAction="#onMusicFolderClick"/>
             <Button fx:id="rewindBtn" onAction="#onRewindClick" disable="true">
