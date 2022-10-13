@@ -142,7 +142,7 @@ public class MainController {
         slider.valueProperty().addListener((observableValue, oldValue, newValue) -> {
             mediaPlayer.setVolume(newValue.doubleValue());
         });
-        slider.setPrefWidth(250);
+        slider.setPrefWidth(300);
         FontIcon icon = new FontIcon("fa-volume-up");
         icon.setIconSize(20);
         Label imageLabel = new Label();
