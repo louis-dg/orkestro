@@ -80,7 +80,7 @@ public class MainController {
                 for (File mediaFile : fileManager.getAudioFiles(mediasDir.listFiles())) {
                     Media media = new Media(mediaFile.toURI().toURL().toString());
                     MediaPlayer mediaPlayer = new MediaPlayer(media);
-                    mediaPlayer.setOnEndOfMedia(() -> mediaPlayer.dispose()); // MediaPlayer keeps a lock on the file. Use dispose to release it
+                    mediaPlayer.setOnEndOfMedia(() -> stopAllMedias());
                     // all media must have the same time duration, so we take any of them to manage the progress on the time slider
                     if (first){
                         first = false;
