@@ -230,7 +230,7 @@ public class MainController {
             alert.show();
         } else {
 
-            List<File> selectedFiles = null;
+            List<File> selectedFiles;
             JFileChooser jfc = new JFileChooser();
             jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
             jfc.setMultiSelectionEnabled(true);
@@ -239,23 +239,23 @@ public class MainController {
             int returnValue = jfc.showOpenDialog(null);
             if (returnValue == JFileChooser.APPROVE_OPTION) {
                 selectedFiles = fileManager.getAudioFiles(jfc.getSelectedFiles());
-            }
+                //TODO : sanitize input names
 
-            //TODO : sanitize input names
-            TextInputDialog dialog = new TextInputDialog();
-            dialog.setTitle("Ajouter un morceau");
-            dialog.setHeaderText("Nom un morceau");
-            Optional<String> result = dialog.showAndWait();
-            List<File> finalSelectedFiles = selectedFiles;
-            result.ifPresent(name -> {
-                if (name.isBlank()) {
-                    Alert alert = new Alert(Alert.AlertType.ERROR, "Le nom de morceau ne peut pas être vide", ButtonType.OK);
-                    alert.show();
-                    return;
-                }
-                fileManager.importTracks(finalSelectedFiles, artist, name);
-                updateTrackListView(artist);
-            });
+                TextInputDialog dialog = new TextInputDialog();
+                dialog.setTitle("Ajouter un morceau");
+                dialog.setHeaderText("Nom un morceau");
+                Optional<String> result = dialog.showAndWait();
+                List<File> finalSelectedFiles = selectedFiles;
+                result.ifPresent(name -> {
+                    if (name.isBlank()) {
+                        Alert alert = new Alert(Alert.AlertType.ERROR, "Le nom de morceau ne peut pas être vide", ButtonType.OK);
+                        alert.show();
+                        return;
+                    }
+                    fileManager.importTracks(finalSelectedFiles, artist, name);
+                    updateTrackListView(artist);
+                });
+            }
         }
     }
 
