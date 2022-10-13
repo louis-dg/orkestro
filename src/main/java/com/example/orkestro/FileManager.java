@@ -75,13 +75,11 @@ public class FileManager {
     }
 
     public void deleteTrackFolder(String group, String track) {
-        File trackDir = getTrackDir(group, track);
-        deleteFolder(trackDir);
+        deleteFolder(getTrackDir(group, track));
     }
 
     public void deleteGroupFolder(String group) {
-        File groupDir = getGroupDir(group);
-        deleteFolder(groupDir);
+        deleteFolder(getGroupDir(group));
     }
 
     public void deleteFolder(File file) {

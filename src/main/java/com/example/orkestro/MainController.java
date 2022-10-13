@@ -36,7 +36,7 @@ public class MainController {
 
     private Map<String, MediaPlayer> medias = new HashMap<>();
     private boolean isPlaying = false;
-    private TimeSlider timeSlider = new TimeSlider(medias);
+    private TimeSlider timeSlider = new TimeSlider(medias.values());
     private FileManager fileManager = new FileManager();
     private static final double DEFAULT_VOLUME = 0.5d;
 
@@ -75,11 +75,12 @@ public class MainController {
                 for (File mediaFile : fileManager.getAudioFiles(mediasDir.listFiles())) {
                     Media media = new Media(mediaFile.toURI().toURL().toString());
                     MediaPlayer mediaPlayer = new MediaPlayer(media);
+                    mediaPlayer.setOnEndOfMedia(() -> mediaPlayer.dispose()); // MediaPlayer keeps a lock on the file. Use dispose to release it
                     // all media must have the same time duration, so we take any of them to manage the progress on the time slider
                     if (first){
                         first = false;
                         mediaPlayer.currentTimeProperty().addListener((observableValue, oldDuration, newDuration) -> {
-                            timeSlider.update(mediaPlayer);
+                            timeSlider.update(mediaPlayer.getTotalDuration().toMillis(), mediaPlayer.getCurrentTime().toMillis());
                         });
                     }
                     medias.put(mediaFile.getName(), mediaPlayer);
@@ -99,11 +100,13 @@ public class MainController {
         // update sliders
         tracksPane.getChildren().clear();
         timeSlider.reset();
-        for (Map.Entry<String, MediaPlayer> entry : medias.entrySet()) {
-            tracksPane.getChildren().add(new Label(entry.getKey()));
-            tracksPane.getChildren().add(buildVolumeSlider(entry.getValue()));
+        if (medias.entrySet().size() > 0){
+            for (Map.Entry<String, MediaPlayer> entry : medias.entrySet()) {
+                tracksPane.getChildren().add(new Label(entry.getKey()));
+                tracksPane.getChildren().add(buildVolumeSlider(entry.getValue()));
+            }
+            tracksPane.getChildren().add(timeSlider);
         }
-        tracksPane.getChildren().add(timeSlider);
     }
 
     @FXML
@@ -115,7 +118,8 @@ public class MainController {
         } else {
             playAllMedias();
             if (medias.values().size() > 0) {
-                timeSlider.update(medias.values().iterator().next());
+                MediaPlayer player = medias.values().iterator().next();
+                timeSlider.update(player.getTotalDuration().toMillis(), player.getCurrentTime().toMillis());
             }
         }
     }
@@ -265,10 +269,14 @@ public class MainController {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Voulez vous vraiment supprimer le morceau \"" + selected + "\" ?", ButtonType.YES, ButtonType.NO);
             alert.showAndWait().ifPresent(response -> {
                 if (response.equals(ButtonType.YES)){
-                    fileManager.deleteTrackFolder(groupListView.getSelectionModel().getSelectedItem(), selected);
-                    tracksListView.getItems().remove(selected);
+                    stopAllMedias();
+//                    tracksListView.getItems().remove(selected);
                     tracksPane.getChildren().clear();
                     timeSlider.reset();
+                    medias.values().stream().forEach(mediaPlayer -> mediaPlayer.dispose()); // MediaPlayer keeps a lock on the file. Use dispose to release it
+                    medias.clear();
+                    fileManager.deleteTrackFolder(groupListView.getSelectionModel().getSelectedItem(), selected);
+                    updateTrackListView(groupListView.getSelectionModel().getSelectedItem());
                 }
             });
         }

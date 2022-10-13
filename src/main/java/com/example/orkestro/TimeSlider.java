@@ -7,7 +7,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 
-import java.util.Map;
+import java.util.Collection;
 
 public class TimeSlider extends HBox {
 
@@ -15,13 +15,13 @@ public class TimeSlider extends HBox {
 
     private Label label = new Label();
 
-    public TimeSlider(Map<String, MediaPlayer> medias) {
+    public TimeSlider(Collection<MediaPlayer> medias) {
         // on click, go to the corresponding time of the audio file
         slider.setOnMouseClicked(event -> {
             slider.setValueChanging(true);
             double value = (event.getX()/slider.getWidth())*slider.getMax();
             slider.setValue(value);
-            for (MediaPlayer mediaplayer: medias.values()) {
+            for (MediaPlayer mediaplayer: medias) {
                 mediaplayer.seek(Duration.millis(value));
             }
             slider.setValueChanging(false);
@@ -32,13 +32,11 @@ public class TimeSlider extends HBox {
         getChildren().add(label);
     }
 
-    public void update(MediaPlayer mediaPlayer) {
-        Double max = mediaPlayer.getTotalDuration().toMillis();
-        Double current = mediaPlayer.getCurrentTime().toMillis();
-        if (mediaPlayer != null && !Double.isNaN(max)) {
+    public void update(Double max, Double currentValue) {
+        if (max != null && !Double.isNaN(max) && currentValue != null && !Double.isNaN(currentValue)) {
             slider.setMax(max);
-            slider.setValue(current);
-            label.setText(getTimeFromDouble(current) + "/" + getTimeFromDouble(max));
+            slider.setValue(currentValue);
+            label.setText(getTimeFromDouble(currentValue) + "/" + getTimeFromDouble(max));
         }
     }
 

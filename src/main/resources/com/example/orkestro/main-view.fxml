@@ -16,12 +16,12 @@
         <Label>Groupes</Label>
         <ListView fx:id="groupListView" maxHeight="Infinity"/>
         <HBox>
-            <Button fx:id="addGroup" onAction="#onAddGroupClick">
+            <Button fx:id="addGroupBtn" onAction="#onAddGroupClick">
                 <graphic>
                     <FontIcon iconLiteral="fa-plus"/>
                 </graphic>
             </Button>
-            <Button fx:id="deleteGroup" onAction="#onMinusGroupClick">
+            <Button fx:id="deleteGroupBtn" onAction="#onMinusGroupClick">
                 <graphic>
                     <FontIcon iconLiteral="fa-minus"/>
                 </graphic>
@@ -32,12 +32,12 @@
         <Label>Morceaux</Label>
         <ListView fx:id="tracksListView"/>
         <HBox>
-            <Button fx:id="addTrack" onAction="#onAddTrackClick">
+            <Button fx:id="addTrackBtn" onAction="#onAddTrackClick">
                 <graphic>
                     <FontIcon iconLiteral="fa-plus"/>
                 </graphic>
             </Button>
-            <Button fx:id="deleteTrack" onAction="#onMinusTrackClick">
+            <Button fx:id="deleteTrackBtn" onAction="#onMinusTrackClick">
                 <graphic>
                     <FontIcon iconLiteral="fa-minus"/>
                 </graphic>
