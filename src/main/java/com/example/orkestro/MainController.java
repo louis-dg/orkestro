@@ -302,4 +302,7 @@ public class MainController {
         }
     }
 
+    public void onCloseClick(ActionEvent actionEvent) {
+        System.exit(0);
+    }
 }

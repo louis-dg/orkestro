@@ -14,6 +14,7 @@
         <menus>
             <Menu text="Fichier">
                 <MenuItem text="Dossier principal" onAction="#onBaseFolderClick"/>
+                <MenuItem text="Fermer" onAction="#onCloseClick"/>
             </Menu>
         </menus>
     </MenuBar>
