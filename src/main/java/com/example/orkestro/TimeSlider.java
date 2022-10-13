@@ -1,5 +1,6 @@
 package com.example.orkestro;
 
+import javafx.geometry.Insets;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.layout.HBox;
@@ -16,6 +17,7 @@ public class TimeSlider extends HBox {
     private Label label = new Label();
 
     public TimeSlider(Collection<MediaPlayer> medias) {
+        setPadding(new Insets(30, 0, 0, 0));
         // on click, go to the corresponding time of the audio file
         slider.setOnMouseClicked(event -> {
             slider.setValueChanging(true);

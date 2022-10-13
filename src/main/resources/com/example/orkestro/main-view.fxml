@@ -19,11 +19,11 @@
 
     <VBox GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS" GridPane.hgrow="ALWAYS" minWidth="300" spacing="2">
         <padding>
-            <Insets top="10" right="5" bottom="10" left="10"/>
+            <Insets top="5" right="2" bottom="10" left="15"/>
         </padding>
         <Label>Groupes</Label>
         <ListView fx:id="groupListView" maxHeight="Infinity"/>
-        <HBox >
+        <HBox spacing="2">
             <Button fx:id="addGroupBtn" onAction="#onAddGroupClick">
                 <graphic>
                     <FontIcon iconLiteral="fa-plus"/>
@@ -36,13 +36,13 @@
             </Button>
         </HBox>
     </VBox>
-    <VBox GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS" GridPane.hgrow="ALWAYS">
+    <VBox GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS" GridPane.hgrow="ALWAYS" minWidth="300" spacing="2">
         <padding>
-            <Insets top="10" right="5" bottom="5" left="10"/>
+            <Insets top="5" right="2" bottom="10" left="2"/>
         </padding>
         <Label>Morceaux</Label>
         <ListView fx:id="tracksListView"/>
-        <HBox>
+        <HBox spacing="2">
             <Button fx:id="addTrackBtn" onAction="#onAddTrackClick">
                 <graphic>
                     <FontIcon iconLiteral="fa-plus"/>
@@ -55,9 +55,9 @@
             </Button>
         </HBox>
     </VBox>
-    <VBox GridPane.columnIndex="2" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS" GridPane.hgrow="ALWAYS">
+    <VBox GridPane.columnIndex="2" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS" GridPane.hgrow="ALWAYS" minWidth="300">
         <padding>
-            <Insets top="10" right="10" bottom="10" left="5"/>
+            <Insets top="5" right="15" bottom="10" left="2"/>
         </padding>
         <HBox spacing="10">
             <Button fx:id="rewindBtn" onAction="#onRewindClick" disable="true">
@@ -76,6 +76,10 @@
                 </graphic>
             </Button>
         </HBox>
-        <VBox spacing="5" fx:id="tracksPane"/>
+        <VBox spacing="5" fx:id="tracksPane">
+            <padding>
+                <Insets top="10"/>
+            </padding>
+        </VBox>
     </VBox>
 </GridPane>
