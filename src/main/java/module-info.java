@@ -1,4 +1,4 @@
-module com.example.orkestro {
+module com.orkestro {
     requires javafx.controls;
     requires javafx.fxml;
 
@@ -7,6 +7,6 @@ module com.example.orkestro {
     requires org.apache.commons.io;
     requires org.kordamp.ikonli.javafx;
 
-    opens com.example.orkestro to javafx.fxml;
-    exports com.example.orkestro;
+    opens com.orkestro to javafx.fxml;
+    exports com.orkestro;
 }

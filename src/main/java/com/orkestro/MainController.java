@@ -1,4 +1,4 @@
-package com.example.orkestro;
+package com.orkestro;
 
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;

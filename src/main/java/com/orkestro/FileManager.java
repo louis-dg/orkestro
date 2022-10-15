@@ -1,4 +1,4 @@
-package com.example.orkestro;
+package com.orkestro;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

@@ -1,4 +1,4 @@
-package com.example.orkestro;
+package com.orkestro;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
