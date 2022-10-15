@@ -134,13 +134,21 @@ public class MainController {
     private Node buildVolumeSlider(MediaPlayer mediaPlayer) {
         FlowPane flowPane = new FlowPane(Orientation.HORIZONTAL);
         flowPane.setAlignment(Pos.CENTER_LEFT);
-        Slider slider = new Slider(0, 1 ,DEFAULT_VOLUME);
+        Slider slider = new Slider(0, 1, DEFAULT_VOLUME);
         slider.setShowTickMarks(true);
         slider.setShowTickLabels(true);
         slider.setMajorTickUnit(0.25f);
         slider.setBlockIncrement(0.1f);
+        if (fileManager.getCache() != null) {
+            Double cachedValue = fileManager.getCache().getVolumeLevel(groupListView.getSelectionModel().getSelectedItem(), mediaPlayer.getMedia().getSource());
+            if (cachedValue != null) {
+                slider.setValue(cachedValue.doubleValue());
+                mediaPlayer.setVolume(cachedValue);
+            }
+        }
         slider.valueProperty().addListener((observableValue, oldValue, newValue) -> {
             mediaPlayer.setVolume(newValue.doubleValue());
+            fileManager.updateCache(groupListView.getSelectionModel().getSelectedItem(), mediaPlayer.getMedia().getSource(), newValue.doubleValue());
         });
         slider.setPrefWidth(300);
         FontIcon icon = new FontIcon("fa-volume-up");
