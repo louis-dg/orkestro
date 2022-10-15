@@ -10,6 +10,7 @@ import java.io.*;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.util.*;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 public class FileManager {
@@ -80,16 +81,16 @@ public class FileManager {
             try {
                 cache = deserializeCache(cacheFile);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                Logs.getLogger().log(Level.WARNING, "Could not deserialize cache", e);
             } catch (ClassNotFoundException e) {
-                throw new RuntimeException(e);
+                Logs.getLogger().log(Level.WARNING, "Could not deserialize cache", e);
             }
         } else {
             try {
                 cacheFile.createNewFile();
                 cache = new TracksCache();
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                Logs.getLogger().log(Level.WARNING, "Could not create cache file", e);
             }
         }
     }
@@ -107,9 +108,9 @@ public class FileManager {
                 cache.setVolumeLevel(artist, audioFileName, volumeValue);
                 serializeCache(cache, cacheFile);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                Logs.getLogger().log(Level.WARNING, "Could not update cache", e);
             } catch (URISyntaxException e) {
-                throw new RuntimeException(e);
+                Logs.getLogger().log(Level.WARNING, "Could not update cache", e);
             }
         }
     }
@@ -136,8 +137,7 @@ public class FileManager {
         try {
             FileUtils.deleteDirectory(file);
         } catch (IOException e) {
-            System.out.println("Could not delete " + file.getAbsolutePath());
-            throw new RuntimeException(e);
+            Logs.getLogger().log(Level.WARNING, "Could not delete " + file.getAbsolutePath(), e);
         }
     }
 
@@ -156,7 +156,8 @@ public class FileManager {
                 try {
                     Files.copy(newAudioFile.toPath(), new File(songDir.getAbsolutePath() + File.separator + newAudioFile.getName()).toPath());
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    Logs.getLogger().log(Level.SEVERE, "Could not copy new audio file " + newAudioFile.getAbsolutePath()
+                            + " to " + new File(songDir.getAbsolutePath() + File.separator + newAudioFile.getName()).getAbsolutePath(), e);
                 }
             }
         }
@@ -196,7 +197,7 @@ public class FileManager {
                 return cache;
             }
         }
-        System.out.println("Error in deserialization");
+        Logs.getLogger().warning("Error during cache deserialization");
         return null;
     }
 

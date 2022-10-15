@@ -10,6 +10,7 @@ import java.io.IOException;
 public class OrkestroApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
+        Logs.getLogger().info("Starting Orkestro application");
         FXMLLoader fxmlLoader = new FXMLLoader(OrkestroApplication.class.getResource("main-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
         stage.setTitle("Orkestro");

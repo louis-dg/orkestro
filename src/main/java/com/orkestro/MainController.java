@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.logging.Level;
 
 public class MainController {
 
@@ -68,6 +69,7 @@ public class MainController {
             updateTrackListView(nextValue);
             tracksPane.getChildren().clear();
         });
+        Logs.getLogger().info("End application initialization");
     }
 
     private void updateMediaMap(String group, String track) {
@@ -92,6 +94,7 @@ public class MainController {
                 }
             }
         } catch (MalformedURLException e) {
+            Logs.getLogger().log(Level.SEVERE, "Could update media map", e);
             throw new RuntimeException(e);
         }
     }
