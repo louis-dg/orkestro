@@ -42,8 +42,10 @@ public class MainController {
 
     private Map<String, MediaPlayer> medias = new HashMap<>();
     private boolean isPlaying = false;
-    private TimeSlider timeSlider = new TimeSlider(medias.values());
-    private FileManager fileManager = new FileManager();
+    private final TimeSlider timeSlider = new TimeSlider(medias.values());
+    private final FileManager fileManager = new FileManager();
+    private final CacheManager cacheManager = new CacheManager();
+
     private static final double DEFAULT_VOLUME = 0.5d;
 
     //https://docs.oracle.com/javase/8/javafx/api/javafx/fxml/doc-files/introduction_to_fxml.html#controllers
@@ -142,8 +144,8 @@ public class MainController {
         slider.setShowTickLabels(true);
         slider.setMajorTickUnit(0.25f);
         slider.setBlockIncrement(0.1f);
-        if (fileManager.getCache() != null) {
-            Double cachedValue = fileManager.getCache().getVolumeLevel(groupListView.getSelectionModel().getSelectedItem(), mediaPlayer.getMedia().getSource());
+        if (cacheManager.getCache() != null) {
+            Double cachedValue = cacheManager.getCache().getVolumeLevel(groupListView.getSelectionModel().getSelectedItem(), mediaPlayer.getMedia().getSource());
             if (cachedValue != null) {
                 slider.setValue(cachedValue.doubleValue());
                 mediaPlayer.setVolume(cachedValue);
@@ -151,7 +153,7 @@ public class MainController {
         }
         slider.valueProperty().addListener((observableValue, oldValue, newValue) -> {
             mediaPlayer.setVolume(newValue.doubleValue());
-            fileManager.updateCache(groupListView.getSelectionModel().getSelectedItem(), mediaPlayer.getMedia().getSource(), newValue.doubleValue());
+            cacheManager.updateCache(groupListView.getSelectionModel().getSelectedItem(), mediaPlayer.getMedia().getSource(), newValue.doubleValue());
         });
         slider.setPrefWidth(300);
         FontIcon icon = new FontIcon("fa-volume-up");
@@ -198,9 +200,12 @@ public class MainController {
     }
 
     private void initBaseFolder() {
-        fileManager.initBaseDir();
-        groupListView.getItems().clear();
-        groupListView.setItems(fileManager.initgroups());
+        boolean initDone = fileManager.initBaseDir();
+        if (initDone) {
+            groupListView.getItems().clear();
+            groupListView.setItems(fileManager.initgroups());
+            cacheManager.initCache(fileManager.getBaseDir());
+        }
     }
 
     @FXML
