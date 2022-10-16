@@ -57,7 +57,7 @@ public class FileManager {
     public boolean initBaseDir() {
         JFileChooser jfc = new JFileChooser();
         jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        jfc.setDialogTitle("Choisissez un dossier de base");
+        jfc.setDialogTitle(OrkestroApplication.getRessource("choose_base_dir"));
         int returnValue = jfc.showOpenDialog(null);
 
         if (returnValue == JFileChooser.APPROVE_OPTION) {

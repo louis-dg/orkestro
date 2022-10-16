@@ -225,9 +225,9 @@ public class MainController {
     @FXML
     public void onAddGroupClick(ActionEvent actionEvent) {
         TextInputDialog dialog = new TextInputDialog();
-        dialog.setTitle("Ajouter un groupe");
-        dialog.setHeaderText("Ajouter un groupe");
-        dialog.setContentText("Nom du groupe : ");
+        dialog.setTitle(OrkestroApplication.getRessource("add_group"));
+        dialog.setHeaderText(OrkestroApplication.getRessource("add_group"));
+        dialog.setContentText(OrkestroApplication.getRessource("group_name"));
         Optional<String> result = dialog.showAndWait();
         result.ifPresent(name -> {
             groupListView.getItems().add(name);
@@ -239,10 +239,11 @@ public class MainController {
     public void onMinusGroupClick(ActionEvent actionEvent) {
         String selected = groupListView.getSelectionModel().getSelectedItem();
         if (selected == null) {
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Veuillez sélectionner un groupe", ButtonType.OK);
+            Alert alert = new Alert(Alert.AlertType.ERROR, OrkestroApplication.getRessource("choose_group"), ButtonType.OK);
             alert.show();
         } else {
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Voulez vous vraiment supprimer le groupe \"" + selected + "\" ?", ButtonType.YES, ButtonType.NO);
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION, OrkestroApplication.getRessource("confirm_delete_group")
+                    + " \"" + selected + "\" ?", ButtonType.YES, ButtonType.NO);
             alert.showAndWait().ifPresent(response -> {
                 if (response.equals(ButtonType.YES)){
                     fileManager.deleteGroupFolder(selected);
@@ -258,7 +259,7 @@ public class MainController {
     public void onAddTrackClick(ActionEvent actionEvent) {
         String artist = groupListView.getSelectionModel().getSelectedItem();
         if (artist == null) {
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Veuillez sélectionner un groupe", ButtonType.OK);
+            Alert alert = new Alert(Alert.AlertType.ERROR, OrkestroApplication.getRessource("please_select_group"), ButtonType.OK);
             alert.show();
         } else {
 
@@ -266,7 +267,7 @@ public class MainController {
             JFileChooser jfc = new JFileChooser();
             jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
             jfc.setMultiSelectionEnabled(true);
-            jfc.setDialogTitle("Selectionnez les fichiers à importer");
+            jfc.setDialogTitle(OrkestroApplication.getRessource("select_files_to_import"));
 
             int returnValue = jfc.showOpenDialog(null);
             if (returnValue == JFileChooser.APPROVE_OPTION) {
@@ -280,7 +281,7 @@ public class MainController {
                 List<File> finalSelectedFiles = selectedFiles;
                 result.ifPresent(name -> {
                     if (name.isBlank()) {
-                        Alert alert = new Alert(Alert.AlertType.ERROR, "Le nom de morceau ne peut pas être vide", ButtonType.OK);
+                        Alert alert = new Alert(Alert.AlertType.ERROR, OrkestroApplication.getRessource("track_name_empty"), ButtonType.OK);
                         alert.show();
                         return;
                     }
@@ -295,10 +296,11 @@ public class MainController {
     public void onMinusTrackClick(ActionEvent actionEvent) {
         String selected = tracksListView.getSelectionModel().getSelectedItem();
         if (selected == null) {
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Veuillez sélectionner un morceau", ButtonType.OK);
+            Alert alert = new Alert(Alert.AlertType.ERROR, OrkestroApplication.getRessource("please_select_track"), ButtonType.OK);
             alert.show();
         } else {
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Voulez vous vraiment supprimer le morceau \"" + selected + "\" ?", ButtonType.YES, ButtonType.NO);
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION, OrkestroApplication.getRessource("confirm_delete_track")
+                    + " \"" + selected + "\" ?", ButtonType.YES, ButtonType.NO);
             alert.showAndWait().ifPresent(response -> {
                 if (response.equals(ButtonType.YES)){
                     stopAllMedias();

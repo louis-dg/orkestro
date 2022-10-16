@@ -12,9 +12,9 @@
 
     <MenuBar GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="0" GridPane.hgrow="ALWAYS">
         <menus>
-            <Menu text="Fichier">
-                <MenuItem text="Dossier principal" onAction="#onBaseFolderClick"/>
-                <MenuItem text="Fermer" onAction="#onCloseClick"/>
+            <Menu text="%file">
+                <MenuItem text="%main_folder" onAction="#onBaseFolderClick"/>
+                <MenuItem text="%close" onAction="#onCloseClick"/>
             </Menu>
         </menus>
     </MenuBar>
@@ -23,7 +23,7 @@
         <padding>
             <Insets top="5" right="2" bottom="10" left="15"/>
         </padding>
-        <Label text="Groupes">
+        <Label text="%groups">
             <font>
                 <Font size="14.0"/>
             </font>
@@ -46,7 +46,7 @@
         <padding>
             <Insets top="5" right="2" bottom="10" left="2"/>
         </padding>
-        <Label text="Morceaux">
+        <Label text="%tracks">
             <font>
                 <Font size="14.0"/>
             </font>
