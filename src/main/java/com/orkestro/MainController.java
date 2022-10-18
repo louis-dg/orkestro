@@ -7,6 +7,7 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
@@ -34,6 +35,12 @@ public class MainController {
     @FXML
     public Button rewindBtn;
     @FXML
+    public Slider timeSlider;
+    @FXML
+    public Label labelCurrentTime;
+    @FXML
+    public Label labelTotalTime;
+    @FXML
     private VBox tracksPane = new VBox();
     @FXML
     private ListView<String> groupListView = new ListView<>();
@@ -42,11 +49,11 @@ public class MainController {
 
     private Map<String, MediaPlayer> medias = new HashMap<>();
     private boolean isPlaying = false;
-    private final TimeSlider timeSlider = new TimeSlider(medias.values());
     private final FileManager fileManager = new FileManager();
     private final CacheManager cacheManager = new CacheManager();
 
     private static final double DEFAULT_VOLUME = 0.5d;
+    private static final int PLAY_BUTTON_SIZE = 35;
 
     //https://docs.oracle.com/javase/8/javafx/api/javafx/fxml/doc-files/introduction_to_fxml.html#controllers
     @FXML
@@ -89,7 +96,7 @@ public class MainController {
                     if (first){
                         first = false;
                         mediaPlayer.currentTimeProperty().addListener((observableValue, oldDuration, newDuration) -> {
-                            timeSlider.update(mediaPlayer.getTotalDuration().toMillis(), mediaPlayer.getCurrentTime().toMillis());
+                            updateTimeSlider(mediaPlayer.getTotalDuration().toMillis(), mediaPlayer.getCurrentTime().toMillis());
                         });
                     }
                     medias.put(mediaFile.getName(), mediaPlayer);
@@ -109,7 +116,7 @@ public class MainController {
     private void updatePlayerGUI() {
         // update sliders
         tracksPane.getChildren().clear();
-        timeSlider.reset();
+        resetTimeSlider();
         if (medias.entrySet().size() > 0){
             for (Map.Entry<String, MediaPlayer> entry : medias.entrySet()) {
                 Label lbl = new Label(entry.getKey());
@@ -117,7 +124,6 @@ public class MainController {
                 tracksPane.getChildren().add(lbl);
                 tracksPane.getChildren().add(buildVolumeSlider(entry.getValue()));
             }
-            tracksPane.getChildren().add(timeSlider);
         }
     }
 
@@ -126,12 +132,12 @@ public class MainController {
     {
         if (isPlaying) {
             stopAllMedias();
-            timeSlider.reset();
+            resetTimeSlider();
         } else {
             playAllMedias();
             if (medias.values().size() > 0) {
                 MediaPlayer player = medias.values().iterator().next();
-                timeSlider.update(player.getTotalDuration().toMillis(), player.getCurrentTime().toMillis());
+                updateTimeSlider(player.getTotalDuration().toMillis(), player.getCurrentTime().toMillis());
             }
         }
     }
@@ -155,7 +161,7 @@ public class MainController {
             mediaPlayer.setVolume(newValue.doubleValue());
             cacheManager.updateCache(groupListView.getSelectionModel().getSelectedItem(), mediaPlayer.getMedia().getSource(), newValue.doubleValue());
         });
-        slider.setPrefWidth(300);
+        slider.setPrefWidth(230);
         FontIcon icon = new FontIcon("fa-volume-up");
         icon.setIconSize(20);
         Label imageLabel = new Label();
@@ -169,7 +175,7 @@ public class MainController {
         isPlaying = true;
         FontIcon icon = new FontIcon("fa-stop-circle");
         icon.setIconColor(Paint.valueOf("#bb0000"));
-        icon.setIconSize(25);
+        icon.setIconSize(PLAY_BUTTON_SIZE);
         playBtn.setGraphic(icon);
         setFwrRwdButonsDisable(false);
         for (MediaPlayer mediaplayer: medias.values()) {
@@ -181,7 +187,7 @@ public class MainController {
         isPlaying = false;
         FontIcon icon = new FontIcon("fa-play-circle");
         icon.setIconColor(Paint.valueOf("#008000"));
-        icon.setIconSize(25);
+        icon.setIconSize(PLAY_BUTTON_SIZE);
         playBtn.setGraphic(icon);
         setFwrRwdButonsDisable(true);
         for (MediaPlayer mediaplayer: medias.values()) {
@@ -206,6 +212,34 @@ public class MainController {
             groupListView.setItems(fileManager.initgroups());
             cacheManager.initCache(fileManager.getBaseDir());
         }
+    }
+
+    public void updateTimeSlider(Double max, Double currentValue) {
+        if (max != null && !Double.isNaN(max) && currentValue != null && !Double.isNaN(currentValue)) {
+            timeSlider.setMax(max);
+            timeSlider.setValue(currentValue);
+            labelTotalTime.setText(getTimeFromDouble(max));
+            labelCurrentTime.setText(getTimeFromDouble(currentValue));
+        }
+    }
+
+    public void resetTimeSlider() {
+        timeSlider.setValue(0d);
+        timeSlider.setMax(0d);
+        labelTotalTime.setText("");
+    }
+
+    /**
+     *  Build a string from time double value
+     * @param nbMillis
+     * @return
+     */
+    private String getTimeFromDouble(double nbMillis) {
+        long totalSeconds = Math.round(nbMillis) / 1000;
+        long minutes = totalSeconds / 60;
+        long seconds = totalSeconds % 60;
+        String strSeconds = String.format("%02d", seconds);
+        return minutes + ":" + strSeconds;
     }
 
     @FXML
@@ -254,7 +288,7 @@ public class MainController {
                     fileManager.deleteGroupFolder(selected);
                     groupListView.getItems().remove(selected);
                     tracksPane.getChildren().clear();
-                    timeSlider.reset();
+                    resetTimeSlider();
                 }
             });
         }
@@ -310,7 +344,7 @@ public class MainController {
                 if (response.equals(ButtonType.YES)){
                     stopAllMedias();
                     tracksPane.getChildren().clear();
-                    timeSlider.reset();
+                    resetTimeSlider();
                     medias.values().stream().forEach(mediaPlayer -> mediaPlayer.dispose()); // MediaPlayer keeps a lock on the file. Use dispose to release it
                     medias.clear();
                     fileManager.deleteTrackFolder(groupListView.getSelectionModel().getSelectedItem(), selected);
@@ -322,5 +356,15 @@ public class MainController {
 
     public void onCloseClick(ActionEvent actionEvent) {
         System.exit(0);
+    }
+
+    public void onTimeSliderClick(MouseEvent mouseEvent) {
+        timeSlider.setValueChanging(true);
+        double value = (mouseEvent.getX()/timeSlider.getWidth())*timeSlider.getMax();
+        timeSlider.setValue(value);
+        for (MediaPlayer mediaplayer: medias.values()) {
+            mediaplayer.seek(Duration.millis(value));
+        }
+        timeSlider.setValueChanging(false);
     }
 }
