@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 
 public class MainController {
@@ -145,6 +146,8 @@ public class MainController {
     private Node buildVolumeSlider(MediaPlayer mediaPlayer) {
         FlowPane flowPane = new FlowPane(Orientation.HORIZONTAL);
         flowPane.setAlignment(Pos.CENTER_LEFT);
+        flowPane.setHgap(5);
+
         Slider slider = new Slider(0, 1, DEFAULT_VOLUME);
         slider.setShowTickMarks(true);
         slider.setShowTickLabels(true);
@@ -162,11 +165,30 @@ public class MainController {
             cacheManager.updateCache(groupListView.getSelectionModel().getSelectedItem(), mediaPlayer.getMedia().getSource(), newValue.doubleValue());
         });
         slider.setPrefWidth(230);
-        FontIcon icon = new FontIcon("fa-volume-up");
-        icon.setIconSize(20);
-        Label imageLabel = new Label();
-        imageLabel.setGraphic(icon);
-        flowPane.getChildren().add(imageLabel);
+
+        int iconSize = 20;
+        FontIcon iconVolumeOff = new FontIcon("fa-volume-off");
+        iconVolumeOff.setIconSize(iconSize);
+        FontIcon iconVolumeUp = new FontIcon("fa-volume-up");
+        iconVolumeUp.setIconSize(iconSize);
+        Button volumeButton = new Button();
+        AtomicBoolean isMuted = new AtomicBoolean(false);
+        double lastValue = slider.getValue();
+        volumeButton.setOnAction(actionEvent -> {
+            if (isMuted.get()){
+                slider.setValue(lastValue > 0 ? lastValue : DEFAULT_VOLUME);
+                volumeButton.setGraphic(iconVolumeUp);
+                isMuted.set(false);
+            }else{
+                slider.setValue(0);
+                volumeButton.setGraphic(iconVolumeOff);
+                isMuted.set(true);
+            }
+        });
+        volumeButton.setGraphic(lastValue == 0d ? iconVolumeOff : iconVolumeUp);
+        volumeButton.setMinWidth(35);
+
+        flowPane.getChildren().add(volumeButton);
         flowPane.getChildren().add(slider);
         return flowPane;
     }
