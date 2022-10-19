@@ -63,7 +63,7 @@
             </Button>
         </HBox>
     </VBox>
-    <VBox GridPane.columnIndex="2" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS" GridPane.hgrow="ALWAYS" minWidth="350">
+    <VBox GridPane.columnIndex="2" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS" GridPane.hgrow="ALWAYS" minWidth="400">
         <padding>
             <Insets top="5" right="15" bottom="10" left="2"/>
         </padding>
@@ -72,11 +72,13 @@
                 <Font size="14.0"/>
             </font>
         </Label>
-        <VBox spacing="5" fx:id="tracksPane">
-            <padding>
-                <Insets top="20"/>
-            </padding>
-        </VBox>
+        <ScrollPane styleClass="edge-to-edge" hbarPolicy="NEVER">
+            <VBox spacing="5" fx:id="volumePane">
+                <padding>
+                    <Insets top="20"/>
+                </padding>
+            </VBox>
+        </ScrollPane>
     </VBox>
     <BorderPane GridPane.columnIndex="0" GridPane.rowIndex="2" GridPane.columnSpan="3">
         <left>

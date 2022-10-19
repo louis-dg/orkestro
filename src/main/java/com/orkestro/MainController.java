@@ -41,7 +41,7 @@ public class MainController {
     @FXML
     public Label labelTotalTime;
     @FXML
-    private VBox tracksPane = new VBox();
+    private VBox volumePane = new VBox();
     @FXML
     private ListView<String> groupListView = new ListView<>();
     @FXML
@@ -76,7 +76,7 @@ public class MainController {
             medias.clear();
             setControlButonsDisable(true);
             updateTrackListView(nextValue);
-            tracksPane.getChildren().clear();
+            volumePane.getChildren().clear();
         });
         Logs.getLogger().info("End application initialization");
     }
@@ -115,14 +115,14 @@ public class MainController {
 
     private void updatePlayerGUI() {
         // update sliders
-        tracksPane.getChildren().clear();
+        volumePane.getChildren().clear();
         resetTimeSlider();
         if (medias.entrySet().size() > 0){
             for (Map.Entry<String, MediaPlayer> entry : medias.entrySet()) {
                 Label lbl = new Label(entry.getKey());
                 lbl.setFont(new Font(13));
-                tracksPane.getChildren().add(lbl);
-                tracksPane.getChildren().add(buildVolumeSlider(entry.getValue()));
+                volumePane.getChildren().add(lbl);
+                volumePane.getChildren().add(buildVolumeSlider(entry.getValue()));
             }
         }
     }
@@ -287,7 +287,7 @@ public class MainController {
                 if (response.equals(ButtonType.YES)){
                     fileManager.deleteGroupFolder(selected);
                     groupListView.getItems().remove(selected);
-                    tracksPane.getChildren().clear();
+                    volumePane.getChildren().clear();
                     resetTimeSlider();
                 }
             });
@@ -343,7 +343,7 @@ public class MainController {
             alert.showAndWait().ifPresent(response -> {
                 if (response.equals(ButtonType.YES)){
                     stopAllMedias();
-                    tracksPane.getChildren().clear();
+                    volumePane.getChildren().clear();
                     resetTimeSlider();
                     medias.values().stream().forEach(mediaPlayer -> mediaPlayer.dispose()); // MediaPlayer keeps a lock on the file. Use dispose to release it
                     medias.clear();
