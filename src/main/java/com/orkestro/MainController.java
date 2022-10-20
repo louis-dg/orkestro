@@ -180,21 +180,16 @@ public class MainController {
         FontIcon iconVolumeUp = new FontIcon("fa-volume-up");
         iconVolumeUp.setIconSize(iconSize);
         Button volumeButton = new Button();
-        AtomicBoolean isMuted = new AtomicBoolean(false);
-        AtomicReference<Double> lastValue = new AtomicReference<>(slider.getValue());
         volumeButton.setOnAction(actionEvent -> {
-            if (isMuted.get()){
-                slider.setValue(lastValue.get());
+            if (mediaPlayer.isMute()){
                 volumeButton.setGraphic(iconVolumeUp);
-                isMuted.set(false);
+                mediaPlayer.setMute(false);
             }else{
-                lastValue.set(slider.getValue());
-                slider.setValue(0);
                 volumeButton.setGraphic(iconVolumeOff);
-                isMuted.set(true);
+                mediaPlayer.setMute(true);
             }
         });
-        volumeButton.setGraphic(lastValue.get() == 0d ? iconVolumeOff : iconVolumeUp);
+        volumeButton.setGraphic(mediaPlayer.isMute() ? iconVolumeOff : iconVolumeUp);
         volumeButton.setMinWidth(35);
 
         flowPane.getChildren().add(volumeButton);
