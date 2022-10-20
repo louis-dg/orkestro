@@ -21,19 +21,19 @@
         <padding>
             <Insets top="5" right="2" bottom="10" left="15"/>
         </padding>
-        <Label text="%groups">
+        <Label text="%artist">
             <font>
                 <Font size="14.0"/>
             </font>
         </Label>
-        <ListView fx:id="groupListView" maxHeight="Infinity"/>
+        <ListView fx:id="artistListView" maxHeight="Infinity"/>
         <HBox spacing="2">
-            <Button fx:id="addGroupBtn" onAction="#onAddGroupClick">
+            <Button fx:id="addGroupBtn" onAction="#onAddArtistClick">
                 <graphic>
                     <FontIcon iconLiteral="fa-plus"/>
                 </graphic>
             </Button>
-            <Button fx:id="deleteGroupBtn" onAction="#onMinusGroupClick">
+            <Button fx:id="deleteGroupBtn" onAction="#onMinusArtistClick">
                 <graphic>
                     <FontIcon iconLiteral="fa-minus"/>
                 </graphic>
@@ -44,7 +44,7 @@
         <padding>
             <Insets top="5" right="2" bottom="10" left="2"/>
         </padding>
-        <Label text="%tracks">
+        <Label text="%track">
             <font>
                 <Font size="14.0"/>
             </font>

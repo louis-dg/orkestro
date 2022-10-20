@@ -44,7 +44,7 @@ public class MainController {
     @FXML
     private VBox volumePane = new VBox();
     @FXML
-    private ListView<String> groupListView = new ListView<>();
+    private ListView<String> artistListView = new ListView<>();
     @FXML
     private ListView<String> tracksListView = new ListView<>();
 
@@ -66,13 +66,13 @@ public class MainController {
                 stopAllMedias();
             }
             if (tracksListView.getSelectionModel().getSelectedItem() != null){
-                updateMediaMap(groupListView.getSelectionModel().getSelectedItem(), tracksListView.getSelectionModel().getSelectedItem());
+                updateMediaMap(artistListView.getSelectionModel().getSelectedItem(), tracksListView.getSelectionModel().getSelectedItem());
             }
             updatePlayerGUI();
         });
 
-        groupListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-        groupListView.getSelectionModel().selectedItemProperty().addListener((observableValue, previousValue, nextValue) -> {
+        artistListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        artistListView.getSelectionModel().selectedItemProperty().addListener((observableValue, previousValue, nextValue) -> {
             stopAllMedias();
             medias.clear();
             setControlButonsDisable(true);
@@ -82,12 +82,12 @@ public class MainController {
         Logs.getLogger().info("End application initialization");
     }
 
-    private void updateMediaMap(String group, String track) {
+    private void updateMediaMap(String artist, String track) {
         // build medias map
         medias.clear();
         try {
             if (fileManager.getBaseDir() != null) {
-                File mediasDir = fileManager.getTrackDir(group, track);
+                File mediasDir = fileManager.getTrackDir(artist, track);
                 boolean first = true;
                 for (File mediaFile : fileManager.getAudioFiles(mediasDir.listFiles())) {
                     Media media = new Media(mediaFile.toURI().toURL().toString());
@@ -109,8 +109,8 @@ public class MainController {
         }
     }
 
-    private void updateTrackListView(String group) {
-        ObservableList<String> list = fileManager.buildTrackslist(fileManager.getGroupDir(group));
+    private void updateTrackListView(String artist) {
+        ObservableList<String> list = fileManager.buildTrackslist(fileManager.getArtistDir(artist));
         tracksListView.setItems(list);
     }
 
@@ -154,7 +154,7 @@ public class MainController {
         slider.setMajorTickUnit(0.25f);
         slider.setBlockIncrement(0.1f);
         if (cacheManager.getCache() != null) {
-            Double cachedValue = cacheManager.getCache().getVolumeLevel(groupListView.getSelectionModel().getSelectedItem(), mediaPlayer.getMedia().getSource());
+            Double cachedValue = cacheManager.getCache().getVolumeLevel(artistListView.getSelectionModel().getSelectedItem(), mediaPlayer.getMedia().getSource());
             if (cachedValue != null) {
                 slider.setValue(cachedValue.doubleValue());
                 mediaPlayer.setVolume(cachedValue);
@@ -162,7 +162,7 @@ public class MainController {
         }
         slider.valueProperty().addListener((observableValue, oldValue, newValue) -> {
             mediaPlayer.setVolume(newValue.doubleValue());
-            cacheManager.updateCache(groupListView.getSelectionModel().getSelectedItem(), mediaPlayer.getMedia().getSource(), newValue.doubleValue());
+            cacheManager.updateCache(artistListView.getSelectionModel().getSelectedItem(), mediaPlayer.getMedia().getSource(), newValue.doubleValue());
         });
         slider.setPrefWidth(230);
 
@@ -230,8 +230,8 @@ public class MainController {
     private void initBaseFolder() {
         boolean initDone = fileManager.initBaseDir();
         if (initDone) {
-            groupListView.getItems().clear();
-            groupListView.setItems(fileManager.initgroups());
+            artistListView.getItems().clear();
+            artistListView.setItems(fileManager.initArtists());
             cacheManager.initCache(fileManager.getBaseDir());
         }
     }
@@ -284,31 +284,31 @@ public class MainController {
     }
 
     @FXML
-    public void onAddGroupClick(ActionEvent actionEvent) {
+    public void onAddArtistClick(ActionEvent actionEvent) {
         TextInputDialog dialog = new TextInputDialog();
-        dialog.setTitle(OrkestroApplication.getRessource("add_group"));
-        dialog.setHeaderText(OrkestroApplication.getRessource("add_group"));
-        dialog.setContentText(OrkestroApplication.getRessource("group_name"));
+        dialog.setTitle(OrkestroApplication.getRessource("add_artist"));
+        dialog.setHeaderText(OrkestroApplication.getRessource("add_artist"));
+        dialog.setContentText(OrkestroApplication.getRessource("artist_name"));
         Optional<String> result = dialog.showAndWait();
         result.ifPresent(name -> {
-            groupListView.getItems().add(name);
-            fileManager.getGroupDir(name).mkdir();
+            artistListView.getItems().add(name);
+            fileManager.getArtistDir(name).mkdir();
         });
     }
 
     @FXML
-    public void onMinusGroupClick(ActionEvent actionEvent) {
-        String selected = groupListView.getSelectionModel().getSelectedItem();
+    public void onMinusArtistClick(ActionEvent actionEvent) {
+        String selected = artistListView.getSelectionModel().getSelectedItem();
         if (selected == null) {
-            Alert alert = new Alert(Alert.AlertType.ERROR, OrkestroApplication.getRessource("choose_group"), ButtonType.OK);
+            Alert alert = new Alert(Alert.AlertType.ERROR, OrkestroApplication.getRessource("choose_artist"), ButtonType.OK);
             alert.show();
         } else {
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION, OrkestroApplication.getRessource("confirm_delete_group")
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION, OrkestroApplication.getRessource("confirm_delete_artist")
                     + " \"" + selected + "\" ?", ButtonType.YES, ButtonType.NO);
             alert.showAndWait().ifPresent(response -> {
                 if (response.equals(ButtonType.YES)){
-                    fileManager.deleteGroupFolder(selected);
-                    groupListView.getItems().remove(selected);
+                    fileManager.deleteArtistFolder(selected);
+                    artistListView.getItems().remove(selected);
                     volumePane.getChildren().clear();
                     resetTimeSlider();
                 }
@@ -318,9 +318,9 @@ public class MainController {
 
     @FXML
     public void onAddTrackClick(ActionEvent actionEvent) {
-        String artist = groupListView.getSelectionModel().getSelectedItem();
+        String artist = artistListView.getSelectionModel().getSelectedItem();
         if (artist == null) {
-            Alert alert = new Alert(Alert.AlertType.ERROR, OrkestroApplication.getRessource("please_select_group"), ButtonType.OK);
+            Alert alert = new Alert(Alert.AlertType.ERROR, OrkestroApplication.getRessource("please_select_artist"), ButtonType.OK);
             alert.show();
         } else {
 
@@ -369,8 +369,8 @@ public class MainController {
                     resetTimeSlider();
                     medias.values().stream().forEach(mediaPlayer -> mediaPlayer.dispose()); // MediaPlayer keeps a lock on the file. Use dispose to release it
                     medias.clear();
-                    fileManager.deleteTrackFolder(groupListView.getSelectionModel().getSelectedItem(), selected);
-                    updateTrackListView(groupListView.getSelectionModel().getSelectedItem());
+                    fileManager.deleteTrackFolder(artistListView.getSelectionModel().getSelectedItem(), selected);
+                    updateTrackListView(artistListView.getSelectionModel().getSelectedItem());
                 }
             });
         }

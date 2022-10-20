@@ -21,27 +21,27 @@ public class FileManager {
     }
 
     /**
-     * @return a list of sudirectories (representing the list of music groups) of base directory
+     * @return a list of subdirectories (representing the list of artists) from the base directory
      */
-    public ObservableList<String> initgroups() {
-        List<String> groupDirectories = new ArrayList<>();
+    public ObservableList<String> initArtists() {
+        List<String> artistDirectories = new ArrayList<>();
         if (baseDir != null) {
             for (File file : baseDir.listFiles()) {
                 if (file.isDirectory()) {
-                    groupDirectories.add(file.getName());
+                    artistDirectories.add(file.getName());
                 }
             }
         }
-        return FXCollections.observableArrayList(groupDirectories);
+        return FXCollections.observableArrayList(artistDirectories);
     }
 
     /**
-     * @param groupDir the group directory
-     * @return the list of tracks names from a group directory
+     * @param artistDir the artistDir directory
+     * @return the list of tracks names from a artistDir directory
      */
-    public ObservableList<String> buildTrackslist(File groupDir) {
+    public ObservableList<String> buildTrackslist(File artistDir) {
         List<String> tracks = new ArrayList<>();
-        for (File file : groupDir.listFiles()) {
+        for (File file : artistDir.listFiles()) {
             if (file.isDirectory()) {
                 tracks.add(file.getName());
             }
@@ -75,12 +75,12 @@ public class FileManager {
         return Arrays.stream(files).filter(file -> audioExtension.contains(FilenameUtils.getExtension(file.getName()))).collect(Collectors.toList());
     }
 
-    public void deleteTrackFolder(String group, String track) {
-        deleteFolder(getTrackDir(group, track));
+    public void deleteTrackFolder(String artist, String track) {
+        deleteFolder(getTrackDir(artist, track));
     }
 
-    public void deleteGroupFolder(String group) {
-        deleteFolder(getGroupDir(group));
+    public void deleteArtistFolder(String artist) {
+        deleteFolder(getArtistDir(artist));
     }
 
     public void deleteFolder(File file) {
@@ -93,7 +93,7 @@ public class FileManager {
 
     public void importTracks(List<File> selectedFiles, String artist, String track) {
         if (getBaseDir() != null) {
-            File artistDir = getGroupDir(artist);
+            File artistDir = getArtistDir(artist);
             if (!artistDir.exists()) {
                 artistDir.mkdirs();
             }
@@ -113,12 +113,12 @@ public class FileManager {
         }
     }
 
-    public File getGroupDir(String group) {
-        return new File(getBaseDir().getAbsolutePath() + File.separator + group);
+    public File getArtistDir(String artist) {
+        return new File(getBaseDir().getAbsolutePath() + File.separator + artist);
     }
 
-    public File getTrackDir(String group, String track) {
-        return new File(getGroupDir(group).getAbsolutePath() + File.separator + track);
+    public File getTrackDir(String artist, String track) {
+        return new File(getArtistDir(artist).getAbsolutePath() + File.separator + track);
     }
 
     public File getBaseDir() {
