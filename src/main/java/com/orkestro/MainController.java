@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 
 public class MainController {
@@ -173,19 +174,20 @@ public class MainController {
         iconVolumeUp.setIconSize(iconSize);
         Button volumeButton = new Button();
         AtomicBoolean isMuted = new AtomicBoolean(false);
-        double lastValue = slider.getValue();
+        AtomicReference<Double> lastValue = new AtomicReference<>(slider.getValue());
         volumeButton.setOnAction(actionEvent -> {
             if (isMuted.get()){
-                slider.setValue(lastValue > 0 ? lastValue : DEFAULT_VOLUME);
+                slider.setValue(lastValue.get());
                 volumeButton.setGraphic(iconVolumeUp);
                 isMuted.set(false);
             }else{
+                lastValue.set(slider.getValue());
                 slider.setValue(0);
                 volumeButton.setGraphic(iconVolumeOff);
                 isMuted.set(true);
             }
         });
-        volumeButton.setGraphic(lastValue == 0d ? iconVolumeOff : iconVolumeUp);
+        volumeButton.setGraphic(lastValue.get() == 0d ? iconVolumeOff : iconVolumeUp);
         volumeButton.setMinWidth(35);
 
         flowPane.getChildren().add(volumeButton);
