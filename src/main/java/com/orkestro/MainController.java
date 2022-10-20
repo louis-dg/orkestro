@@ -56,10 +56,17 @@ public class MainController {
 
     private static final double DEFAULT_VOLUME = 0.5d;
     private static final int PLAY_BUTTON_SIZE = 35;
+    private static final FontIcon START_ICON = new FontIcon("fa-play-circle");
+    private static final FontIcon STOP_ICON = new FontIcon("fa-stop-circle");
 
     //https://docs.oracle.com/javase/8/javafx/api/javafx/fxml/doc-files/introduction_to_fxml.html#controllers
     @FXML
     public void initialize() {
+        START_ICON.setIconColor(Paint.valueOf("#008000"));
+        START_ICON.setIconSize(PLAY_BUTTON_SIZE);
+        STOP_ICON.setIconColor(Paint.valueOf("#bb0000"));
+        STOP_ICON.setIconSize(PLAY_BUTTON_SIZE);
+
         tracksListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         tracksListView.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
             if(newValue != null){
@@ -197,10 +204,7 @@ public class MainController {
 
     private void playAllMedias() {
         isPlaying = true;
-        FontIcon icon = new FontIcon("fa-stop-circle");
-        icon.setIconColor(Paint.valueOf("#bb0000"));
-        icon.setIconSize(PLAY_BUTTON_SIZE);
-        playBtn.setGraphic(icon);
+        playBtn.setGraphic(STOP_ICON);
         setFwrRwdButonsDisable(false);
         for (MediaPlayer mediaplayer: medias.values()) {
             mediaplayer.play();
@@ -209,10 +213,7 @@ public class MainController {
 
     private void stopAllMedias() {
         isPlaying = false;
-        FontIcon icon = new FontIcon("fa-play-circle");
-        icon.setIconColor(Paint.valueOf("#008000"));
-        icon.setIconSize(PLAY_BUTTON_SIZE);
-        playBtn.setGraphic(icon);
+        playBtn.setGraphic(START_ICON);
         setFwrRwdButonsDisable(true);
         for (MediaPlayer mediaplayer: medias.values()) {
             mediaplayer.stop();
