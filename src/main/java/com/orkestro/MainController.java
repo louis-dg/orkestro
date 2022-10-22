@@ -20,12 +20,7 @@ import org.kordamp.ikonli.javafx.FontIcon;
 import javax.swing.*;
 import java.io.File;
 import java.net.MalformedURLException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
@@ -73,24 +68,29 @@ public class MainController {
         tracksListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         tracksListView.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
             if(newValue != null){
+                resetSelectedMedia();
+                if (tracksListView.getSelectionModel().getSelectedItem() != null){
+                    updateMediaMap(artistListView.getSelectionModel().getSelectedItem(), tracksListView.getSelectionModel().getSelectedItem());
+                }
+                updatePlayerGUI();
                 setControlButonsDisable(false);
-                stopAllMedias();
             }
-            if (tracksListView.getSelectionModel().getSelectedItem() != null){
-                updateMediaMap(artistListView.getSelectionModel().getSelectedItem(), tracksListView.getSelectionModel().getSelectedItem());
-            }
-            updatePlayerGUI();
         });
 
         artistListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         artistListView.getSelectionModel().selectedItemProperty().addListener((observableValue, previousValue, nextValue) -> {
-            stopAllMedias();
-            medias.clear();
-            setControlButonsDisable(true);
+            resetSelectedMedia();
             updateTrackListView(nextValue);
-            volumePane.getChildren().clear();
         });
         Logs.getLogger().info("End application initialization");
+    }
+
+    private void resetSelectedMedia() {
+        stopMedias(medias.values());
+        medias.values().stream().forEach(mediaPlayer -> mediaPlayer.dispose()); // MediaPlayer keeps a lock on the file. Use dispose to release it
+        medias.clear();
+        volumePane.getChildren().clear();
+        setControlButonsDisable(true);
     }
 
     private void updateMediaMap(String artist, String track) {
@@ -103,7 +103,6 @@ public class MainController {
                 for (File mediaFile : fileManager.getAudioFiles(mediasDir.listFiles())) {
                     Media media = new Media(mediaFile.toURI().toURL().toString());
                     MediaPlayer mediaPlayer = new MediaPlayer(media);
-                    mediaPlayer.setOnEndOfMedia(() -> stopAllMedias());
                     // all media must have the same time duration, so we take any of them to manage the progress on the time slider
                     if (first){
                         first = false;
@@ -113,7 +112,10 @@ public class MainController {
                     }
                     medias.put(mediaFile.getName(), mediaPlayer);
                 }
-                Logs.getLogger().info("Media map updated whith artist '" + artist + "' and track '" + track + "'");
+                for (MediaPlayer mediaPlayer : medias.values()){
+                    mediaPlayer.setOnEndOfMedia(() -> stopMedias(medias.values()));
+                }
+                Logs.getLogger().info("Media map updated with artist '" + artist + "' and track '" + track + "'");
             }
         } catch (MalformedURLException e) {
             Logs.getLogger().log(Level.SEVERE, "Could update media map", e);
@@ -129,7 +131,6 @@ public class MainController {
     private void updatePlayerGUI() {
         // update sliders
         volumePane.getChildren().clear();
-        resetTimeSlider();
         if (medias.entrySet().size() > 0){
             for (Map.Entry<String, MediaPlayer> entry : medias.entrySet()) {
                 Label lbl = new Label(entry.getKey());
@@ -144,13 +145,10 @@ public class MainController {
     protected void onPlayClick()
     {
         if (isPlaying) {
-            stopAllMedias();
-            resetTimeSlider();
+            stopMedias(medias.values());
         } else {
-            playAllMedias();
             if (medias.values().size() > 0) {
-                MediaPlayer player = medias.values().iterator().next();
-                updateTimeSlider(player.getTotalDuration().toMillis(), player.getCurrentTime().toMillis());
+                playMedias(medias.values());
             }
         }
     }
@@ -201,22 +199,23 @@ public class MainController {
         return flowPane;
     }
 
-    private void playAllMedias() {
+    private void playMedias(Collection<MediaPlayer> medias) {
         isPlaying = true;
         playBtn.setGraphic(STOP_ICON);
         setFwrRwdButonsDisable(false);
-        for (MediaPlayer mediaplayer: medias.values()) {
+        for (MediaPlayer mediaplayer: medias) {
             mediaplayer.play();
         }
     }
 
-    private void stopAllMedias() {
+    private void stopMedias(Collection<MediaPlayer> medias) {
         isPlaying = false;
-        playBtn.setGraphic(START_ICON);
-        setFwrRwdButonsDisable(true);
-        for (MediaPlayer mediaplayer: medias.values()) {
+        for (MediaPlayer mediaplayer: medias) {
             mediaplayer.stop();
         }
+        playBtn.setGraphic(START_ICON);
+        setFwrRwdButonsDisable(true);
+        resetTimeSlider();
     }
 
     private void setControlButonsDisable(boolean disable) {
@@ -252,6 +251,7 @@ public class MainController {
         timeSlider.setValue(0d);
         timeSlider.setMax(0d);
         labelTotalTime.setText("");
+        labelCurrentTime.setText("");
     }
 
     /**
@@ -383,11 +383,7 @@ public class MainController {
                     + " \"" + selected + "\" ?", ButtonType.YES, ButtonType.NO);
             alert.showAndWait().ifPresent(response -> {
                 if (response.equals(ButtonType.YES)){
-                    stopAllMedias();
-                    volumePane.getChildren().clear();
-                    resetTimeSlider();
-                    medias.values().stream().forEach(mediaPlayer -> mediaPlayer.dispose()); // MediaPlayer keeps a lock on the file. Use dispose to release it
-                    medias.clear();
+                    resetSelectedMedia();
                     fileManager.deleteTrackFolder(artistListView.getSelectionModel().getSelectedItem(), selected);
                     updateTrackListView(artistListView.getSelectionModel().getSelectedItem());
                 }
