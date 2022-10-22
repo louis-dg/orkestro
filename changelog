@@ -1,0 +1,13 @@
+*** Orkestro Release 1.1 ***
+- Rework on the GUI : improved ergonomics, supports resizing
+- Added mute button for each volume slider
+- Better logging
+- Fixed minor bugs
+- Added app logo
+
+*** Orkestro Release 1.0 ***
+- Music player
+- Play multiple audio files in parallel
+- Manage sound volume for each audio track
+- Implemented a cache system to remember audio tracks volume
+- Basic controls to manage audio files
