@@ -59,6 +59,7 @@ public class FileManager {
             File selectedFile = jfc.getSelectedFile();
             if (selectedFile.isDirectory()) {
                 baseDir = selectedFile;
+                Logs.getLogger().info("Base directory initialized with " + baseDir.getAbsolutePath());
                 return true;
             }
         }
@@ -91,26 +92,33 @@ public class FileManager {
         }
     }
 
-    public void importTracks(List<File> selectedFiles, String artist, String track) {
+    public boolean importTracks(List<File> selectedFiles, String artist, String track) {
         if (getBaseDir() != null) {
             File artistDir = getArtistDir(artist);
             if (!artistDir.exists()) {
                 artistDir.mkdirs();
             }
-            File songDir = getTrackDir(artist, track);
-            if (songDir.exists()) {
-                songDir.delete();
-            }
-            songDir.mkdir();
-            for (File newAudioFile : selectedFiles) {
+            File trackDir = getTrackDir(artist, track);
+            if (trackDir.exists()) {
                 try {
-                    Files.copy(newAudioFile.toPath(), new File(songDir.getAbsolutePath() + File.separator + newAudioFile.getName()).toPath());
+                    FileUtils.deleteDirectory(trackDir);
                 } catch (IOException e) {
-                    Logs.getLogger().log(Level.SEVERE, "Could not copy new audio file " + newAudioFile.getAbsolutePath()
-                            + " to " + new File(songDir.getAbsolutePath() + File.separator + newAudioFile.getName()).getAbsolutePath(), e);
+                    Logs.getLogger().severe("Could not delete existing track directory " + trackDir);
                 }
             }
+            trackDir.mkdir();
+            for (File newAudioFile : selectedFiles) {
+                try {
+                    Files.copy(newAudioFile.toPath(), new File(trackDir.getAbsolutePath() + File.separator + newAudioFile.getName()).toPath());
+                } catch (IOException e) {
+                    Logs.getLogger().log(Level.SEVERE, "Could not copy new audio file " + newAudioFile.getAbsolutePath()
+                            + " to " + new File(trackDir.getAbsolutePath() + File.separator + newAudioFile.getName()).getAbsolutePath(), e);
+                    return false;
+                }
+            }
+            return true;
         }
+        return false;
     }
 
     public File getArtistDir(String artist) {

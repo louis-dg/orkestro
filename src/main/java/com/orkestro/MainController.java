@@ -27,6 +27,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 public class MainController {
 
@@ -112,6 +113,7 @@ public class MainController {
                     }
                     medias.put(mediaFile.getName(), mediaPlayer);
                 }
+                Logs.getLogger().info("Media map updated whith artist '" + artist + "' and track '" + track + "'");
             }
         } catch (MalformedURLException e) {
             Logs.getLogger().log(Level.SEVERE, "Could update media map", e);
@@ -291,9 +293,18 @@ public class MainController {
         dialog.setHeaderText(OrkestroApplication.getRessource("add_artist"));
         dialog.setContentText(OrkestroApplication.getRessource("artist_name"));
         Optional<String> result = dialog.showAndWait();
-        result.ifPresent(name -> {
-            artistListView.getItems().add(name);
-            fileManager.getArtistDir(name).mkdir();
+        result.ifPresent(artistName -> {
+            artistListView.getItems().add(artistName);
+            File newArtistFolder = fileManager.getArtistDir(artistName);
+            boolean folderCreated = newArtistFolder.mkdir();
+            if (folderCreated){
+                Logs.getLogger().info("added artist '" + artistName + "'");
+            } else {
+                Logs.getLogger().severe("Could not create folder " + newArtistFolder.getAbsolutePath());
+                Alert alert = new Alert(Alert.AlertType.ERROR, OrkestroApplication.getRessource("could_not_create_folder")
+                        + " : \"" + newArtistFolder.getAbsolutePath(), ButtonType.OK);
+                alert.show();
+            }
         });
     }
 
@@ -334,21 +345,28 @@ public class MainController {
             int returnValue = jfc.showOpenDialog(null);
             if (returnValue == JFileChooser.APPROVE_OPTION) {
                 selectedFiles = fileManager.getAudioFiles(jfc.getSelectedFiles());
-                //TODO : sanitize input names
 
                 TextInputDialog dialog = new TextInputDialog();
-                dialog.setTitle("Ajouter un morceau");
+                dialog.setTitle("Ajouter un morceau"); // TODO
                 dialog.setHeaderText("Nom un morceau");
                 Optional<String> result = dialog.showAndWait();
                 List<File> finalSelectedFiles = selectedFiles;
-                result.ifPresent(name -> {
-                    if (name.isBlank()) {
+                result.ifPresent(trackName -> {
+                    if (trackName.isBlank()) {
                         Alert alert = new Alert(Alert.AlertType.ERROR, OrkestroApplication.getRessource("track_name_empty"), ButtonType.OK);
                         alert.show();
                         return;
                     }
-                    fileManager.importTracks(finalSelectedFiles, artist, name);
-                    updateTrackListView(artist);
+                    boolean importOK = fileManager.importTracks(finalSelectedFiles, artist, trackName);
+                    if (importOK){
+                        updateTrackListView(artist);
+                        Logs.getLogger().info("Imported track '" + trackName + "'");
+                    } else {
+                        Logs.getLogger().severe("Could not import track " + trackName + " with following files : "
+                                + finalSelectedFiles.stream().map(File::toString).collect(Collectors.joining(", ")));
+                        Alert alert = new Alert(Alert.AlertType.ERROR, OrkestroApplication.getRessource("could_not_import_track"), ButtonType.OK);
+                        alert.show();
+                    }
                 });
             }
         }
