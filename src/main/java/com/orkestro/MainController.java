@@ -43,6 +43,8 @@ public class MainController {
     @FXML
     public Label labelTotalTime;
     @FXML
+    public Button addArtistBtn;
+    @FXML
     private VBox volumePane = new VBox();
     @FXML
     private ListView<String> artistListView = new ListView<>();
@@ -231,6 +233,7 @@ public class MainController {
             artistListView.getItems().clear();
             artistListView.setItems(fileManager.initArtists());
             cacheManager.initCache(fileManager.getBaseDir());
+            addArtistBtn.setDisable(false);
         }
     }
 

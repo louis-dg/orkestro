@@ -28,12 +28,12 @@
         </Label>
         <ListView fx:id="artistListView" maxHeight="Infinity"/>
         <HBox spacing="2">
-            <Button fx:id="addGroupBtn" onAction="#onAddArtistClick">
+            <Button fx:id="addArtistBtn" onAction="#onAddArtistClick" disable="true">
                 <graphic>
                     <FontIcon iconLiteral="fa-plus"/>
                 </graphic>
             </Button>
-            <Button fx:id="deleteGroupBtn" onAction="#onMinusArtistClick">
+            <Button onAction="#onMinusArtistClick">
                 <graphic>
                     <FontIcon iconLiteral="fa-minus"/>
                 </graphic>
