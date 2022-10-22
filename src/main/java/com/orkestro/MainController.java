@@ -347,8 +347,8 @@ public class MainController {
                 selectedFiles = fileManager.getAudioFiles(jfc.getSelectedFiles());
 
                 TextInputDialog dialog = new TextInputDialog();
-                dialog.setTitle("Ajouter un morceau"); // TODO
-                dialog.setHeaderText("Nom un morceau");
+                dialog.setTitle(OrkestroApplication.getRessource("add_track"));
+                dialog.setHeaderText(OrkestroApplication.getRessource("track_name"));
                 Optional<String> result = dialog.showAndWait();
                 List<File> finalSelectedFiles = selectedFiles;
                 result.ifPresent(trackName -> {
