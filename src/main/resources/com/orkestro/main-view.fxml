@@ -91,7 +91,7 @@
         <padding>
             <Insets top="5" right="15" bottom="10" left="2"/>
         </padding>
-        <Label text="Volume">
+        <Label text="%volume">
             <font>
                 <Font size="14.0"/>
             </font>
