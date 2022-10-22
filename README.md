@@ -5,6 +5,10 @@ Its aim is to provide a simple software solution for musicians with separate aud
 
 Orkestro is open source because it is distributed under the [GNU GPL v3 license](https://www.gnu.org/licenses/gpl-3.0.en.html).
 
+## Languages
+Currently, the available languages are French and English. 
+
 ## Build
-Orkestro is currently build with maven. It is developed with openJDK 17.
+Orkestro is currently build with maven. It is developed with OpenJDK 17.
 See [pom.xml](pom.xml) for more details.
+You can download OpenJDK [here](https://jdk.java.net/18/).
