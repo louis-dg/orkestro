@@ -17,52 +17,76 @@
         </menus>
     </MenuBar>
 
-    <VBox GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS" GridPane.hgrow="ALWAYS" minWidth="300" spacing="2">
+    <BorderPane GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.hgrow="ALWAYS" minWidth="300">
         <padding>
             <Insets top="5" right="2" bottom="10" left="15"/>
         </padding>
-        <Label text="%artist">
-            <font>
-                <Font size="14.0"/>
-            </font>
-        </Label>
-        <ListView fx:id="artistListView" maxHeight="Infinity"/>
-        <HBox spacing="2">
-            <Button fx:id="addArtistBtn" onAction="#onAddArtistClick" disable="true">
-                <graphic>
-                    <FontIcon iconLiteral="fa-plus"/>
-                </graphic>
-            </Button>
-            <Button onAction="#onMinusArtistClick">
-                <graphic>
-                    <FontIcon iconLiteral="fa-minus"/>
-                </graphic>
-            </Button>
-        </HBox>
-    </VBox>
-    <VBox GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS" GridPane.hgrow="ALWAYS" minWidth="300" spacing="2">
+        <top>
+            <Label text="%artist">
+                <padding>
+                    <Insets bottom="3"/>
+                </padding>
+                <font>
+                    <Font size="14.0"/>
+                </font>
+            </Label>
+        </top>
+        <center>
+            <ListView fx:id="artistListView"/>
+        </center>
+        <bottom>
+            <HBox spacing="3">
+                <padding>
+                    <Insets top="3"/>
+                </padding>
+                <Button fx:id="addArtistBtn" onAction="#onAddArtistClick" disable="true">
+                    <graphic>
+                        <FontIcon iconLiteral="fa-plus"/>
+                    </graphic>
+                </Button>
+                <Button onAction="#onMinusArtistClick">
+                    <graphic>
+                        <FontIcon iconLiteral="fa-minus"/>
+                    </graphic>
+                </Button>
+            </HBox>
+        </bottom>
+    </BorderPane>
+    <BorderPane GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.hgrow="ALWAYS" minWidth="300">
         <padding>
             <Insets top="5" right="2" bottom="10" left="2"/>
         </padding>
-        <Label text="%track">
-            <font>
-                <Font size="14.0"/>
-            </font>
-        </Label>
-        <ListView fx:id="tracksListView"/>
-        <HBox spacing="2">
-            <Button fx:id="addTrackBtn" onAction="#onAddTrackClick">
-                <graphic>
-                    <FontIcon iconLiteral="fa-plus"/>
-                </graphic>
-            </Button>
-            <Button fx:id="deleteTrackBtn" onAction="#onMinusTrackClick">
-                <graphic>
-                    <FontIcon iconLiteral="fa-minus"/>
-                </graphic>
-            </Button>
-        </HBox>
-    </VBox>
+        <top>
+            <Label text="%track">
+                <padding>
+                    <Insets bottom="3"/>
+                </padding>
+                <font>
+                    <Font size="14.0"/>
+                </font>
+            </Label>
+        </top>
+        <center>
+            <ListView fx:id="tracksListView"/>
+        </center>
+        <bottom>
+            <HBox spacing="3">
+                <padding>
+                    <Insets top="3"/>
+                </padding>
+                <Button fx:id="addTrackBtn" onAction="#onAddTrackClick">
+                    <graphic>
+                        <FontIcon iconLiteral="fa-plus"/>
+                    </graphic>
+                </Button>
+                <Button fx:id="deleteTrackBtn" onAction="#onMinusTrackClick">
+                    <graphic>
+                        <FontIcon iconLiteral="fa-minus"/>
+                    </graphic>
+                </Button>
+            </HBox>
+        </bottom>
+    </BorderPane>
     <VBox GridPane.columnIndex="2" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS" GridPane.hgrow="ALWAYS" minWidth="400">
         <padding>
             <Insets top="5" right="15" bottom="10" left="2"/>
@@ -101,7 +125,7 @@
         <bottom>
             <HBox alignment="CENTER" spacing="20">
                 <padding>
-                    <Insets top="10" right="0" bottom="10" left="0"/>
+                    <Insets top="10" bottom="10"/>
                 </padding>
                 <Button fx:id="rewindBtn" onAction="#onRewindClick" disable="true">
                     <graphic>
