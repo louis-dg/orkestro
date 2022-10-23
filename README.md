@@ -12,7 +12,7 @@ Orkestro is open source because it is distributed under the [GNU GPL v3 license]
    * Java
      * Download **orkestro-1.1-shaded.jar** on the [Releases](https://github.com/louis-dg/orkestro/releases) page
      * Run it with Java (version >= 17) 
-       * [Java download page](https://www.oracle.com/fr/java/technologies/downloads/#jdk19-windows) 
+       * [Java download page](https://www.oracle.com/fr/java/technologies/downloads/) 
    * Windows
       * Download **Orkestro-1.1-win-x64.zip** on the [Releases](https://github.com/louis-dg/orkestro/releases) page
       * Unzip it where you want 
