@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -21,6 +22,10 @@ public class OrkestroApplication extends Application {
         FXMLLoader fxmlLoader = new FXMLLoader(OrkestroApplication.class.getResource("main-view.fxml"));
         fxmlLoader.setResources(ResourceBundle.getBundle("com.orkestro.i18n.orkestro", locale));
         Scene scene = new Scene(fxmlLoader.load());
+        scene.addEventFilter(KeyEvent.KEY_PRESSED, keyEvent -> {
+            ((MainController) fxmlLoader.getController()).onKeyEvent(keyEvent);
+            keyEvent.consume();
+        });
         stage.getIcons().add(new Image(getClass().getResource("music-solid.png").toURI().toURL().toString()));
         stage.setTitle("Orkestro");
         stage.setScene(scene);

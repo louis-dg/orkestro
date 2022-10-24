@@ -7,6 +7,8 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
@@ -274,15 +276,19 @@ public class MainController {
 
     @FXML
     public void onForwardClick(ActionEvent actionEvent) {
-        for (MediaPlayer mediaplayer: medias.values()) {
-            mediaplayer.seek(mediaplayer.getCurrentTime().add(Duration.seconds(5)));
+        if (medias != null) {
+            for (MediaPlayer mediaplayer : medias.values()) {
+                mediaplayer.seek(mediaplayer.getCurrentTime().add(Duration.seconds(5)));
+            }
         }
     }
 
     @FXML
     public void onRewindClick(ActionEvent actionEvent) {
-        for (MediaPlayer mediaplayer: medias.values()) {
-            mediaplayer.seek(mediaplayer.getCurrentTime().subtract(Duration.seconds(5)));
+        if (medias != null) {
+            for (MediaPlayer mediaplayer : medias.values()) {
+                mediaplayer.seek(mediaplayer.getCurrentTime().subtract(Duration.seconds(5)));
+            }
         }
     }
 
@@ -403,5 +409,15 @@ public class MainController {
             mediaplayer.seek(Duration.millis(value));
         }
         timeSlider.setValueChanging(false);
+    }
+
+    public void onKeyEvent(KeyEvent keyEvent) {
+        if (keyEvent.getCode() == KeyCode.SPACE) {
+            onPlayClick();
+        } else if (keyEvent.getCode() == KeyCode.RIGHT) {
+            onForwardClick(null);
+        } else if (keyEvent.getCode() == KeyCode.LEFT) {
+            onRewindClick(null);
+        }
     }
 }
