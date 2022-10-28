@@ -1,5 +1,6 @@
 package com.orkestro;
 
+import com.orkestro.cache.CacheManager;
 import com.orkestro.properties.PropertiesManager;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;

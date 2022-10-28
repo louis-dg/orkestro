@@ -1,4 +1,6 @@
-package com.orkestro;
+package com.orkestro.cache;
+
+import com.orkestro.Logs;
 
 import java.io.*;
 import java.net.URISyntaxException;

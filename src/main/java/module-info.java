@@ -12,4 +12,6 @@ module com.orkestro {
     opens com.orkestro to javafx.fxml;
     exports com.orkestro;
     exports com.orkestro.properties;
+    exports com.orkestro.cache;
+    opens com.orkestro.cache to javafx.fxml;
 }

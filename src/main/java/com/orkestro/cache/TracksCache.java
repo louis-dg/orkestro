@@ -1,4 +1,4 @@
-package com.orkestro;
+package com.orkestro.cache;
 
 import java.io.Serializable;
 import java.util.HashMap;
