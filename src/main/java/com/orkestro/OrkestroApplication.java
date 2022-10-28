@@ -1,5 +1,6 @@
 package com.orkestro;
 
+import com.orkestro.properties.PropertiesManager;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -19,6 +20,10 @@ public class OrkestroApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException, URISyntaxException {
         Logs.getLogger().info("Starting Orkestro application");
+
+        // initialiser les Properties
+        PropertiesManager.getPropertiesManager();
+
         FXMLLoader fxmlLoader = new FXMLLoader(OrkestroApplication.class.getResource("main-view.fxml"));
         fxmlLoader.setResources(ResourceBundle.getBundle("com.orkestro.i18n.orkestro", locale));
         Scene scene = new Scene(fxmlLoader.load());

@@ -1,5 +1,6 @@
 package com.orkestro;
 
+import com.orkestro.properties.PropertiesManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import org.apache.commons.io.FileUtils;
@@ -49,7 +50,7 @@ public class FileManager {
         return FXCollections.observableArrayList(tracks);
     }
 
-    public boolean initBaseDir() {
+    public boolean selectMainDir() {
         JFileChooser jfc = new JFileChooser();
         jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         jfc.setDialogTitle(OrkestroApplication.getRessource("choose_base_dir"));
@@ -57,11 +58,17 @@ public class FileManager {
 
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             File selectedFile = jfc.getSelectedFile();
-            if (selectedFile.isDirectory()) {
-                baseDir = selectedFile;
-                Logs.getLogger().info("Base directory initialized with " + baseDir.getAbsolutePath());
-                return true;
-            }
+            return initMainDir(selectedFile);
+        }
+        return false;
+    }
+
+    public boolean initMainDir(File file) {
+        if (file.isDirectory()) {
+            baseDir = file;
+            Logs.getLogger().info("Main directory initialized with " + baseDir.getAbsolutePath());
+            PropertiesManager.getPropertiesManager().addLastMainFolder(baseDir);
+            return true;
         }
         return false;
     }

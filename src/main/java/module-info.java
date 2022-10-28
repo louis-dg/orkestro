@@ -7,7 +7,9 @@ module com.orkestro {
     requires org.apache.commons.io;
     requires org.kordamp.ikonli.javafx;
     requires java.logging;
+    requires org.jetbrains.annotations;
 
     opens com.orkestro to javafx.fxml;
     exports com.orkestro;
+    exports com.orkestro.properties;
 }

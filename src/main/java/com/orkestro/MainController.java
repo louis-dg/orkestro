@@ -1,5 +1,6 @@
 package com.orkestro;
 
+import com.orkestro.properties.PropertiesManager;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -17,6 +18,7 @@ import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.util.Duration;
+import org.jetbrains.annotations.Nullable;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import javax.swing.*;
@@ -42,6 +44,8 @@ public class MainController {
     public Label labelTotalTime;
     @FXML
     public Button addArtistBtn;
+    @FXML
+    public Menu openRecentMenu;
     @FXML
     private VBox volumePane = new VBox();
     @FXML
@@ -84,7 +88,16 @@ public class MainController {
             resetSelectedMedia();
             updateTrackListView(nextValue);
         });
+        initOpenRecentMenu();
         Logs.getLogger().info("End application initialization");
+    }
+
+    private void initOpenRecentMenu() {
+        for (File file : PropertiesManager.getPropertiesManager().getLastMainFolders()) {
+            MenuItem menuItem = new MenuItem(file.getName());
+            menuItem.setOnAction(e -> initMainFolder(file));
+            openRecentMenu.getItems().add(menuItem);
+        }
     }
 
     private void resetSelectedMedia() {
@@ -230,8 +243,8 @@ public class MainController {
         rewindBtn.setDisable(disable);
     }
 
-    private void initBaseFolder() {
-        boolean initDone = fileManager.initBaseDir();
+    private void initMainFolder(@Nullable File lastOpenedDir) {
+        boolean initDone = lastOpenedDir == null ? fileManager.selectMainDir() : fileManager.initMainDir(lastOpenedDir);
         if (initDone) {
             artistListView.getItems().clear();
             artistListView.setItems(fileManager.initArtists());
@@ -271,7 +284,7 @@ public class MainController {
 
     @FXML
     public void onBaseFolderClick(ActionEvent actionEvent) {
-        initBaseFolder();
+        initMainFolder(null);
     }
 
     @FXML
