@@ -54,7 +54,7 @@ public class PropertiesManager {
             Properties prop = (Properties) obj;
             return prop;
         }
-        Logs.getLogger().warning("Error during cache deserialization");
+        Logs.getLogger().warning("Error during properties deserialization");
         return null;
     }
 

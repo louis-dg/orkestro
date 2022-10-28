@@ -94,10 +94,14 @@ public class MainController {
     }
 
     private void initOpenRecentMenu() {
-        for (File file : PropertiesManager.getPropertiesManager().getLastMainFolders()) {
-            MenuItem menuItem = new MenuItem(file.getName());
-            menuItem.setOnAction(e -> initMainFolder(file));
-            openRecentMenu.getItems().add(menuItem);
+        if (PropertiesManager.getPropertiesManager().getLastMainFolders().size() > 0) {
+            for (File file : PropertiesManager.getPropertiesManager().getLastMainFolders()) {
+                MenuItem menuItem = new MenuItem(file.getName());
+                menuItem.setOnAction(e -> initMainFolder(file));
+                openRecentMenu.getItems().add(menuItem);
+            }
+        } else {
+            openRecentMenu.setDisable(true);
         }
     }
 
