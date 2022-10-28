@@ -16,18 +16,18 @@ import java.util.stream.Collectors;
 
 public class FileManager {
 
-    private File baseDir = null;
+    private File mainDir = null;
 
     public FileManager() {
     }
 
     /**
-     * @return a list of subdirectories (representing the list of artists) from the base directory
+     * @return a list of subdirectories (representing the list of artists) from the main directory
      */
     public ObservableList<String> initArtists() {
         List<String> artistDirectories = new ArrayList<>();
-        if (baseDir != null) {
-            for (File file : baseDir.listFiles()) {
+        if (mainDir != null) {
+            for (File file : mainDir.listFiles()) {
                 if (file.isDirectory()) {
                     artistDirectories.add(file.getName());
                 }
@@ -65,9 +65,9 @@ public class FileManager {
 
     public boolean initMainDir(File file) {
         if (file.isDirectory()) {
-            baseDir = file;
-            Logs.getLogger().info("Main directory initialized with " + baseDir.getAbsolutePath());
-            PropertiesManager.getPropertiesManager().addLastMainFolder(baseDir);
+            mainDir = file;
+            Logs.getLogger().info("Main directory initialized with " + mainDir.getAbsolutePath());
+            PropertiesManager.getPropertiesManager().addLastMainFolder(mainDir);
             return true;
         }
         return false;
@@ -100,7 +100,7 @@ public class FileManager {
     }
 
     public boolean importTracks(List<File> selectedFiles, String artist, String track) {
-        if (getBaseDir() != null) {
+        if (getMainDir() != null) {
             File artistDir = getArtistDir(artist);
             if (!artistDir.exists()) {
                 artistDir.mkdirs();
@@ -129,14 +129,14 @@ public class FileManager {
     }
 
     public File getArtistDir(String artist) {
-        return new File(getBaseDir().getAbsolutePath() + File.separator + artist);
+        return new File(getMainDir().getAbsolutePath() + File.separator + artist);
     }
 
     public File getTrackDir(String artist, String track) {
         return new File(getArtistDir(artist).getAbsolutePath() + File.separator + track);
     }
 
-    public File getBaseDir() {
-        return baseDir;
+    public File getMainDir() {
+        return mainDir;
     }
 }

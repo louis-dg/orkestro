@@ -11,7 +11,7 @@
     <MenuBar GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="0" GridPane.hgrow="ALWAYS">
         <menus>
             <Menu text="%file">
-                <MenuItem text="%main_folder" onAction="#onBaseFolderClick"/>
+                <MenuItem text="%main_folder" onAction="#onMainFolderClick"/>
                 <Menu text="%open_recent" fx:id="openRecentMenu"/>
                 <MenuItem text="%close" onAction="#onCloseClick"/>
             </Menu>

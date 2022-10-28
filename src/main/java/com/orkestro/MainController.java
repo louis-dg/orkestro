@@ -112,7 +112,7 @@ public class MainController {
         // build medias map
         medias.clear();
         try {
-            if (fileManager.getBaseDir() != null) {
+            if (fileManager.getMainDir() != null) {
                 File mediasDir = fileManager.getTrackDir(artist, track);
                 boolean first = true;
                 for (File mediaFile : fileManager.getAudioFiles(mediasDir.listFiles())) {
@@ -248,7 +248,7 @@ public class MainController {
         if (initDone) {
             artistListView.getItems().clear();
             artistListView.setItems(fileManager.initArtists());
-            cacheManager.initCache(fileManager.getBaseDir());
+            cacheManager.initCache(fileManager.getMainDir());
             addArtistBtn.setDisable(false);
         }
     }
@@ -283,7 +283,7 @@ public class MainController {
     }
 
     @FXML
-    public void onBaseFolderClick(ActionEvent actionEvent) {
+    public void onMainFolderClick(ActionEvent actionEvent) {
         initMainFolder(null);
     }
 
