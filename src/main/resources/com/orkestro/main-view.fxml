@@ -126,7 +126,7 @@
         <bottom>
             <HBox alignment="CENTER" spacing="20">
                 <padding>
-                    <Insets top="10" bottom="10"/>
+                    <Insets top="10" bottom="10" left="10" right="10"/>
                 </padding>
                 <Button fx:id="rewindBtn" onAction="#onRewindClick" disable="true">
                     <graphic>
@@ -143,6 +143,13 @@
                         <FontIcon iconLiteral="fa-angle-double-right" iconSize="35"/>
                     </graphic>
                 </Button>
+                <HBox alignment="CENTER_LEFT" spacing="5">
+                    <padding>
+                        <Insets left="20"/>
+                    </padding>
+                    <Label text="%delay_label"/>
+                    <Spinner fx:id="delaySpinner" min="0" max="5" maxWidth="50" />
+                </HBox>
             </HBox>
         </bottom>
     </BorderPane>

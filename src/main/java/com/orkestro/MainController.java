@@ -22,10 +22,12 @@ import javafx.util.Duration;
 import org.jetbrains.annotations.Nullable;
 import org.kordamp.ikonli.javafx.FontIcon;
 
+import javax.sound.sampled.LineUnavailableException;
 import javax.swing.*;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
@@ -47,6 +49,8 @@ public class MainController {
     public Button addArtistBtn;
     @FXML
     public Menu openRecentMenu;
+    @FXML
+    public Spinner delaySpinner;
     @FXML
     private VBox volumePane = new VBox();
     @FXML
@@ -223,6 +227,19 @@ public class MainController {
         isPlaying = true;
         playBtn.setGraphic(STOP_ICON);
         setFwrRwdButonsDisable(false);
+        int delay = (Integer) delaySpinner.getValue();
+        if (delay > 0){
+            try {
+                for (int i=0; i<delay; i++){
+                    SoundUtils.tone(440, 100, 0.1);
+                    TimeUnit.SECONDS.sleep(1);
+                }
+            } catch (InterruptedException e) {
+                Logs.getLogger().log(Level.WARNING, "Could not apply delay: " + delay, e);
+            } catch (LineUnavailableException e) {
+                Logs.getLogger().log(Level.WARNING, "Could not play beep sound", e);
+            }
+        }
         for (MediaPlayer mediaplayer: medias) {
             mediaplayer.play();
         }
