@@ -96,7 +96,7 @@ public class MainController {
     private void initOpenRecentMenu() {
         if (PropertiesManager.getPropertiesManager().getLastMainFolders().size() > 0) {
             for (File file : PropertiesManager.getPropertiesManager().getLastMainFolders()) {
-                MenuItem menuItem = new MenuItem(file.getName());
+                MenuItem menuItem = new MenuItem(file.getPath());
                 menuItem.setOnAction(e -> initMainFolder(file));
                 openRecentMenu.getItems().add(menuItem);
             }
