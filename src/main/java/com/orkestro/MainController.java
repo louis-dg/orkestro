@@ -52,6 +52,8 @@ public class MainController {
     @FXML
     public Spinner delaySpinner;
     @FXML
+    public MenuItem delaySoundMenuItem;
+    @FXML
     private VBox volumePane = new VBox();
     @FXML
     private ListView<String> artistListView = new ListView<>();
@@ -60,6 +62,7 @@ public class MainController {
 
     private Map<String, MediaPlayer> medias = new HashMap<>();
     private boolean isPlaying = false;
+    private boolean playDelaySound = true;
     private final FileManager fileManager = new FileManager();
     private final CacheManager cacheManager = new CacheManager();
 
@@ -231,7 +234,9 @@ public class MainController {
         if (delay > 0){
             try {
                 for (int i=0; i<delay; i++){
-                    SoundUtils.tone(440, 100, 0.1);
+                    if (playDelaySound){
+                        SoundUtils.tone(440, 100, 0.1);
+                    }
                     TimeUnit.SECONDS.sleep(1);
                 }
             } catch (InterruptedException e) {
@@ -453,6 +458,16 @@ public class MainController {
             onForwardClick(null);
         } else if (keyEvent.getCode() == KeyCode.LEFT) {
             onRewindClick(null);
+        }
+    }
+
+    public void toggleDelaySound(ActionEvent actionEvent) {
+        if (playDelaySound) {
+            playDelaySound = false;
+            delaySoundMenuItem.setText(OrkestroApplication.getRessource("enable_delay_sound"));
+        } else {
+            playDelaySound = true;
+            delaySoundMenuItem.setText(OrkestroApplication.getRessource("disable_delay_sound"));
         }
     }
 }

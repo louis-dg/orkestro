@@ -15,6 +15,9 @@
                 <Menu text="%open_recent" fx:id="openRecentMenu"/>
                 <MenuItem text="%close" onAction="#onCloseClick"/>
             </Menu>
+            <Menu text="%options">
+                <MenuItem fx:id="delaySoundMenuItem" text="%disable_delay_sound" onAction="#toggleDelaySound"/>
+            </Menu>
         </menus>
     </MenuBar>
 
